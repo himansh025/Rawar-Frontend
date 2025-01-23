@@ -1,53 +1,96 @@
 import React, { useState } from 'react';
-import { AiFillCheckCircle, AiFillCloseCircle } from 'react-icons/ai';
 import { ArrowLeft } from 'lucide-react';
-
+import {submitQuestionState} from '../utils/questionDataFetch.js'
 function QuestionSolver({ question, onBack, onNext }) {
-  const [userAnswer, setUserAnswer] = useState('');
+  const [selectedAnswer, setSelectedAnswer] = useState('');
   const [isAnswered, setIsAnswered] = useState(false);
   const [feedback, setFeedback] = useState(null);
+  const [submissionStats, setSubmissionStats] = useState({
+    totalAttempts: 0,
+    correctAnswers: 0,
+    incorrectAnswers: 0,
+    questionsAttempted: new Set(),
+  });
 
-  console.log(question);
+  const handleSubmit = async () => {
+    const isCorrect = selectedAnswer === question.correctAnswer;
+    
+    // Update submission stats
+    setSubmissionStats(prev => {
+      const newStats = {
+        totalAttempts: prev.totalAttempts + 1,
+        correctAnswers: prev.correctAnswers + (isCorrect ? 1 : 0),
+        incorrectAnswers: prev.incorrectAnswers + (isCorrect ? 0 : 1),
+        questionsAttempted: new Set([...prev.questionsAttempted, question._id])
+      };
+      
+      // Store stats in localStorage for persistence
+      // localStorage.setItem('quizStats', JSON.stringify({
+      //   ...newStats,
+      //   questionsAttempted: Array.from(newStats.questionsAttempted)
+      // }));
+      
+      const callsubmit= async()=>{
+        const res= await submitQuestionState(submissionStats)
+        console.log("res submitted",res);
+        
+      } 
+      callsubmit();
+      return newStats;
+    });
 
-  // Answer options (You could use dynamic mapping or just hardcode them for simplicity)
-  const answerOptions = [
-    { label: 'answer_a', text: question.answers.answer_a },
-    { label: 'answer_b', text: question.answers.answer_b },
-    { label: 'answer_c', text: question.answers.answer_c },
-    { label: 'answer_d', text: question.answers.answer_d },
-    { label: 'answer_e', text: question.answers.answer_e },
-    { label: 'answer_f', text: question.answers.answer_f },
-  ].filter(option => option.text !== null);  // Filter out null values
+    // Prepare submission data
+    const submissionData = {
+      questionId: question._id,
+      userAnswer: selectedAnswer,
+      isCorrect,
+      timestamp: new Date().toISOString(),
+      category: question.category,
+      difficulty: question.difficulty,
+      stats: {
+        totalAttempts: submissionStats.totalAttempts + 1,
+        correctAnswers: submissionStats.correctAnswers + (isCorrect ? 1 : 0),
+        incorrectAnswers: submissionStats.incorrectAnswers + (isCorrect ? 0 : 1),
+      }
+    };
 
-  // Get the correct answer key
-  const correctAnswerKey = question?.correct_answers; // e.g., { answer_a: 'true', answer_b: 'false', ... }
-  const correctAnswers = Object.keys(correctAnswerKey).filter(
-    (key) => correctAnswerKey[key] === 'true' // This will filter out only the correct answers
-  );
-console.log(correctAnswers);
+    try {
+      // Send submission data to the backend
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/submissions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
+        body: JSON.stringify(submissionData)
+      });
 
-  const handleSubmit = () => {
-    console.log(userAnswer);
+      if (!response.ok) {
+        throw new Error('Failed to save submission');
+      }
+    } catch (error) {
+      console.error('Error saving submission:', error);
+    }
 
-    // Extract the part before '_correct' in the correct answer key
-    const correctAnswer = correctAnswers[0]?.replace('_correct', ''); // Assumes you have only one correct answer
-
-    const isCorrect = userAnswer === correctAnswer; // Check if selected answer matches the correct answer
     setFeedback({
       isCorrect,
       message: isCorrect
         ? 'Correct! Great job!'
-        : `Incorrect. The correct answer is ${correctAnswer}.`,
+        : `Incorrect. The correct answer is: ${question.correctAnswer}`,
+      stats: {
+        totalAttempts: submissionStats.totalAttempts + 1,
+        correctAnswers: submissionStats.correctAnswers + (isCorrect ? 1 : 0),
+        incorrectAnswers: submissionStats.incorrectAnswers + (isCorrect ? 0 : 1),
+      }
     });
-    setIsAnswered(true); // Lock options after submitting answer
+    setIsAnswered(true);
   };
 
   const handleNext = () => {
-    // Reset the states when moving to the next question
+    setSelectedAnswer('');
+    setIsAnswered(false);
     setFeedback(null);
-    setUserAnswer('');
-    setIsAnswered(false); // Unlock options again
-    onNext(); // Trigger the onNext callback to load the next question
+    onNext();
   };
 
   return (
@@ -56,45 +99,39 @@ console.log(correctAnswers);
         <button
           onClick={onBack}
           className="flex items-center text-gray-600 hover:text-gray-900"
-          aria-label="Go back to the question list"
         >
           <ArrowLeft className="h-5 w-5 mr-1" />
           Back to Questions
         </button>
+        <div className="flex gap-4 text-sm">
+          <span className="text-green-600">Correct: {submissionStats.correctAnswers}</span>
+          <span className="text-red-600">Incorrect: {submissionStats.incorrectAnswers}</span>
+          <span className="text-gray-600">Total: {submissionStats.totalAttempts}</span>
+        </div>
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-gray-900">{question.question}</h2>
-
-          <div className="space-x-2 flex">
-         <div className='mx-1'>
-         <p className="text-sm text-gray-600">
-            <strong>Category:</strong> {question.category}
-          </p>
-         </div>
-         <div className='mx-1'>
-
-          <p className="text-sm text-gray-600">
-            <strong>Description:</strong> {question.description}
-          </p>
-         </div>
-         <div className='mx-1'>
-          <p className="text-sm text-gray-600">
-          
-            <strong>Difficulty:</strong> {question.difficulty}
-          </p>
-         </div>
+        <div className="flex gap-2">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            {question.category}
+          </span>
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            {question.difficulty}
+          </span>
         </div>
 
+        <h2 className="text-xl font-semibold text-gray-900">{question.title}</h2>
+        <p className="text-gray-600">{question.description}</p>
+        <p className="text-lg font-medium text-gray-900">{question.question}</p>
 
-        <div className="space-y-4 mb-6">
-          {answerOptions.map((option, index) => (
+        <div className="space-y-3">
+          {question.options.map((option, index) => (
             <label
               key={index}
               className={`block p-4 border rounded-lg cursor-pointer transition-colors ${
-                userAnswer === option.label
+                selectedAnswer === option
                   ? isAnswered
-                    ? correctAnswers.includes(option.label)
+                    ? option === question.correctAnswer
                       ? 'bg-green-50 border-green-500'
                       : 'bg-red-50 border-red-500'
                     : 'bg-indigo-50 border-indigo-500'
@@ -105,46 +142,54 @@ console.log(correctAnswers);
                 <input
                   type="radio"
                   name="answer"
-                  value={option.label}
-                  checked={userAnswer === option.label}
-                  onChange={(e) => setUserAnswer(e.target.value)}
-                  disabled={isAnswered} // Disable after answer submission
+                  value={option}
+                  checked={selectedAnswer === option}
+                  onChange={(e) => setSelectedAnswer(e.target.value)}
+                  disabled={isAnswered}
                   className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
                 />
-                <span className="ml-3">{option.text}</span>
+                <span className="ml-3">{option}</span>
               </div>
             </label>
           ))}
         </div>
 
         {feedback && (
-          <div className={`p-4 rounded-lg ${feedback.isCorrect ? 'bg-green-50' : 'bg-red-50'}`}>
-            <div className="flex items-center">
-              {feedback.isCorrect ? (
-                <AiFillCheckCircle className="h-5 w-5 text-green-400 mr-2" />
-              ) : (
-                <AiFillCloseCircle className="h-5 w-5 text-red-400 mr-2" />
-              )}
-              <p className={feedback.isCorrect ? 'text-green-700' : 'text-red-700'}>
-                {feedback.message}
-              </p>
-            </div>
-            {isAnswered && question.explanation && (
-              <div className="mt-4">
+          <div
+            className={`p-4 rounded-lg ${
+              feedback.isCorrect ? 'bg-green-50' : 'bg-red-50'
+            }`}
+          >
+            <p
+              className={`font-medium ${
+                feedback.isCorrect ? 'text-green-800' : 'text-red-800'
+              }`}
+            >
+              {feedback.message}
+            </p>
+            {question.explanation && (
+              <div className="mt-2">
                 <h4 className="font-medium text-gray-900">Explanation:</h4>
                 <p className="mt-1 text-gray-600">{question.explanation}</p>
               </div>
             )}
+            <div className="mt-2 text-sm text-gray-600">
+              <p>Session Statistics:</p>
+              <ul className="list-disc pl-5 mt-1">
+                <li>Total Attempts: {feedback.stats.totalAttempts}</li>
+                <li>Correct Answers: {feedback.stats.correctAnswers}</li>
+                <li>Incorrect Answers: {feedback.stats.incorrectAnswers}</li>
+                <li>Success Rate: {((feedback.stats.correctAnswers / feedback.stats.totalAttempts) * 100).toFixed(1)}%</li>
+              </ul>
+            </div>
           </div>
         )}
 
-        {/* Display additional question info like category, description, and difficulty */}
-      
-        <div className="flex justify-end space-x-4">
+        <div className="flex justify-end space-x-4 mt-6">
           {!isAnswered ? (
             <button
               onClick={handleSubmit}
-              disabled={!userAnswer}
+              disabled={!selectedAnswer}
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Submit Answer

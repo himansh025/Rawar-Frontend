@@ -41,7 +41,6 @@ function Login() {
         localStorage.setItem('accessToken', userdata?.data?.user?.accesstoken);
         localStorage.setItem('refreshToken', userdata?.data?.user?.refreshtoken);
         const user = userdata.data.user.loggedinuser;
-
         dispatch(login({ user }));
         navigate('/');
       } else {

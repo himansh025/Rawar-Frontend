@@ -1,15 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { BarChart, Award, Target, Clock, BookOpen, Brain, User, Pencil } from 'lucide-react';
+import {  Award, Target, BookOpen, Brain, User, Pencil, Check } from 'lucide-react';
 import StatesCard from '../components/StatesCard';
 import ProgressBar from '../components/ProgressBar';
-import { getCurrentUser, updateUserAvatar } from '../utils/userDataFetch'; // Import utility functions
+import { getCurrentUser,getUserProfileStats, updateUserAvatar } from '../utils/userDataFetch'; // Import utility functions
 import { useSelector } from 'react-redux';
+const apiUrl = import.meta.env.VITE_API_URL;
+import axios from 'axios'
 
 function UserProfile({ userId }) {
   const [userStats, setUserStats] = useState(null);
-  const [recentActivities, setRecentActivities] = useState([]);
+  // const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const user = useSelector((state) => state.auth.user);
+const [testlenght,settestlength]= useState(0)
+  
+  const fetchTests = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/api/v1/tests/alltests`);
+    let  len = response.data.data.length;
+      // console.log(response);
+      settestlength(len)
+console.log(len); 
+}
+    catch (err) {
+      console.log(err);
+    }
+  };
 
   const handleSubmitAvatar = async (e) => {
     const file = e.target.files[0];
@@ -36,6 +52,9 @@ function UserProfile({ userId }) {
     const fetchUserData = async () => {
       try {
         const { data, success } = await getCurrentUser();
+        const  statsData = await getUserProfileStats();
+        // console.log("states",statsData);
+        const stats= statsData.stats
         if (success) {
           setUserStats({
             name: data.name,
@@ -46,26 +65,17 @@ function UserProfile({ userId }) {
               month: 'long',
             }),
             stats: {
-              completedQuestions: data.progress.completedQuestions,
-              correctAnswers: data.progress.correctAnswers,
-              testsTaken: data.progress.testsTaken,
-              averageScore: data.progress.completedQuestions
-                ? Math.round((data.progress.correctAnswers / data.progress.completedQuestions) * 100)
+              rank:stats.rank,
+              accuracyRate:stats.accuracyRate,
+              completedQuestions: stats.completedQuestions|| 0,
+              correctAnswers: stats.correctAnswersCount|| 0,
+              testsTaken: data.progress.testsTaken || 0,
+              averageScore: stats.completedQuestions
+                ? Math.round((stats.correctAnswersCount / stats.completedQuestions) * 100)
                 : 0,
-              rank: 42, // Placeholder
-              streak: 7, // Placeholder
-            },
+              rank: 42            },
           });
-console.log(userStats.avatar);
-
-          setRecentActivities(
-            data.testSessions.map((session) => ({
-              type: session.status === 'completed' ? 'Mock Test' : 'Practice',
-              title: `Test #${session.testId}`,
-              score: 'N/A', // Placeholder
-              date: new Date(session.startTime).toLocaleDateString('en-US'),
-            }))
-          );
+// console.log(userStats.avatar);
         } else {
           console.error('Failed to fetch user data');
         }
@@ -75,7 +85,7 @@ console.log(userStats.avatar);
         setLoading(false);
       }
     };
-
+fetchTests()
     fetchUserData();
   }, [userId]);
 
@@ -84,7 +94,6 @@ console.log(userStats.avatar);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Profile Header */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <div className="flex items-center space-x-4">
           <div className="relative group">
@@ -127,18 +136,14 @@ console.log(userStats.avatar);
         <StatesCard
           icon={<Target className="h-6 w-6 text-indigo-600" />}
           title="Accuracy Rate"
-          value={`${userStats.stats.averageScore}%`}
+          value={`${userStats.stats.accuracyRate}%`}
         />
         <StatesCard
           icon={<Award className="h-6 w-6 text-indigo-600" />}
           title="Current Rank"
           value={`#${userStats.stats.rank}`}
         />
-        <StatesCard
-          icon={<Clock className="h-6 w-6 text-indigo-600" />}
-          title="Daily Streak"
-          value={`${userStats.stats.streak} days`}
-        />
+  
       </div>
 
       {/* Progress and Recent Activities */}
@@ -153,43 +158,22 @@ console.log(userStats.avatar);
               value={userStats.stats.completedQuestions}
               total={200}
             />
+              <ProgressBar
+              icon={<Check className="h-5 w-5" />}
+              label="Questions Correct"
+              value={userStats.stats.correctAnswers}
+              total={200}
+            />
             <ProgressBar
               icon={<Brain className="h-5 w-5" />}
               label="Tests Completed"
               value={userStats.stats.testsTaken}
               total={20}
             />
-            <ProgressBar
-              icon={<Target className="h-5 w-5" />}
-              label="Average Score"
-              value={userStats.stats.averageScore}
-              total={100}
-              showPercentage
-            />
+    
           </div>
         </div>
 
-        {/* Recent Activity */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
-          <div className="space-y-4">
-            {recentActivities.length > 0 ? (
-              recentActivities.map((activity, index) => (
-                <div key={index} className="flex items-center justify-between border-b pb-3 last:border-0">
-                  <div>
-                    <p className="font-medium text-gray-900">{activity.title}</p>
-                    <p className="text-sm text-gray-500">{activity.type} • {activity.date}</p>
-                  </div>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    {activity.score}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <p>No recent activity.</p>
-            )}
-          </div>
-        </div>
       </div>
     </div>
   );

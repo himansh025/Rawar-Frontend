@@ -1,14 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import Inputfield from '../Inputfield';
 import { useForm } from "react-hook-form";
 import Button from '../Button';
-// import {login} from '../utils/userDataFetch';
 import { login } from '../../store/authSlice.js';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import { load, stopLoad } from '../../store/reloadSlice.js';
-
 const AdminAuth = () => {
   const { register, handleSubmit } = useForm();
   const [loading, setLoading] = useState(false);
@@ -17,13 +14,12 @@ const AdminAuth = () => {
   const [accessToken, setAccessToken] = useState("jbkkhbm");
   Cookies.set('accessToken', accessToken);
 
-  // useEffect(() => {
-  // }, [accessToken]);
+  useEffect(() => {
+  }, [accessToken]);
 
   const onSubmit = async (data, e) => {
     e.preventDefault();
     setLoading(true); // Start loading
-    dispatch(load());
 
     try {
       const userdata = await loginUser(data);
@@ -46,7 +42,6 @@ const AdminAuth = () => {
       setLoading(false);
       alert("An error occurred during login. Please try again.");
     } finally {
-      dispatch(stopLoad());
       setLoading(false);
     }
   };

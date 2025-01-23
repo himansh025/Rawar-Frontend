@@ -1,6 +1,7 @@
 import axios from 'axios'
 const apiUrl = import.meta.env.VITE_API_URL;
 console.log(apiUrl);
+// const token = localStorage.getItem('accessToken');
 
 
 const registerUser = async (formData) => {
@@ -43,13 +44,35 @@ const loginUser = async (formData) => {
   }
 };
 
+const callchatbot = async (data) => {
+  console.log(data);
+  const {prompt} = data;
+  
+  try {
+    const token = localStorage.getItem('accessToken');
+    // console.log(document.cookie.includes('accessToken'))
+    // console.log(token)
+    // console.log(formData)
+    const response = await axios.post(`${apiUrl}/api/v1/user/chatbot`, {prompt},
+       {
+         headers:{
+             Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    } });
+    // console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching logout data:', error);
+  }
+}
+
 const logoutUser = async () => {
   try {
     const token = localStorage.getItem('accessToken');
     // console.log(document.cookie.includes('accessToken'))
     // console.log(token)
     // console.log(formData)
-    const response = await axios.post(`${apiUrl}/api/v1/user/logout`, { token }, { headers: { Authorization: `Bearer ${token}` } });
+    const response = await axios.post(`${apiUrl}/api/v1/logout`, { token }, { headers: { Authorization: `Bearer ${token}` } });
     // console.log(response.data);
     return response.data;
   } catch (error) {
@@ -110,11 +133,32 @@ const getCurrentUser = async () => {
   // throw error; // Optional: rethrow the error if you need to handle it elsewhere
 }
 };
+
+const  getUserProfileStats= async () => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      throw  new Error('No access token found');
+    }
+    
+    const response = await axios.get(`${apiUrl}/api/v1/user/UserProfileStats`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+  console.log('Current user state data:', response.data);
+  return response.data.data;
+} catch (error) {
+  console.error('Error fetching current user data:', error.response?.data || error.message);
+
+}
+};
+
 const updateUserAvatar = async (data)=>{
   try {
     console.log("cover data",data);
     const token = localStorage.getItem('accessToken');
-      const response = await axios.patch(`${apiUrl}/api/v1/user/update-avatar` , data ,{ headers: { Authorization: `Bearer ${token}`}});  
+      const response = await axios.patch(`${apiUrl}/api/v1/user/avatar` , data ,{ headers: { Authorization: `Bearer ${token}`}});  
       // console.log(response.data);
       return response.data;
     } catch (error) {
@@ -128,6 +172,8 @@ export {
   loginUser,
   updateUserAvatar,
   logoutUser,
+  getUserProfileStats,
   refreshAccessToken,
-  verifyOtp
+  verifyOtp,
+  callchatbot
 }

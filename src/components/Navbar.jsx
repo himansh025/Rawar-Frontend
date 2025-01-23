@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { BookOpen, Layout, Menu, TestTube2, Trophy, User } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../store/authSlice.js";
+import pcteLogo from '../image.png' 
 
 function Navbar() {
   const user = useSelector((state) => state.auth.user) || false;
@@ -20,14 +21,13 @@ function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-lg">
+    <nav className="bg-white shadow-lg fixed top-0 left-0 right-0 z-50"> 
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          {/* Brand Logo */}
-          <div className="flex items-center">
+          <div className="flex items-center"> 
+            <img src={pcteLogo} alt="PCTE Logo" className="h-11 w-11 mr-2" /> 
             <Link to="/" className="flex items-center">
-              <BookOpen className="h-8 w-8 text-indigo-600" />
-              <span className="ml-2 text-xl font-bold text-gray-800">PlacementCrack</span>
+              <span className="ml-2 text-sm font-bold text-gray-800">Placement Cell </span>
             </Link>
           </div>
 
@@ -35,7 +35,7 @@ function Navbar() {
           <div className="hidden md:flex md:space-x-8 items-center">
             <NavLink to="/" icon={<Layout className="h-5 w-5" />} text="Dashboard" />
             <NavLink to="/questions" icon={<BookOpen className="h-5 w-5" />} text="Questions" />
-            <NavLink to="/mock-tests" icon={<TestTube2 className="h-5 w-5" />} text="Mock Tests" />
+            <NavLink to="/mocktests" icon={<TestTube2 className="h-5 w-5" />} text="Mock Tests" />
             <NavLink to="/leaderboard" icon={<Trophy className="h-5 w-5" />} text="Leaderboard" />
           </div>
 
@@ -50,14 +50,14 @@ function Navbar() {
                   Login
                 </Link>
                 <Link
-                  to="/register"
+                  to="/signup"
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 >
                   Signup
                 </Link>
                 <Link
                   to="/adminauth"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  className="px-3 py-1 bg-blue-600 hidden md:hidden lg:block text-white rounded-md hover:bg-blue-700" // Corrected class 
                 >
                   Admin
                 </Link>
@@ -97,7 +97,7 @@ function Navbar() {
       >
         <MobileNavLink to="/" text="Home" onClick={toggleMobileMenu} />
         <MobileNavLink to="/questions" text="Questions" onClick={toggleMobileMenu} />
-        <MobileNavLink to="/mock-tests" text="Mock Tests" onClick={toggleMobileMenu} />
+        <MobileNavLink to="/mocktests" text="Mock Tests" onClick={toggleMobileMenu} />
         <MobileNavLink to="/leaderboard" text="Leaderboard" onClick={toggleMobileMenu} />
         {!user ? (
           <div className="space-y-2">

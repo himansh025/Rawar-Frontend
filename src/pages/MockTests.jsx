@@ -1,51 +1,79 @@
-import React, { useState } from 'react';
-import { Clock, Brain, Target, AlertCircle } from 'lucide-react';
-import { useTimer } from '../lib/hooks';
-import { formatTime, calculateTestResults } from '../lib/utils';
+import React, { useState, useEffect } from 'react';
+import { Clock, Brain, Target, CheckCircle, XCircle } from 'lucide-react';
+import { useTimer } from '../utils/hooks';
+import { formatTime } from '../utils/formatTime';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { startTest,submitTestAnswers } from '../utils/testDataFetch.js';
+import { useNavigate } from 'react-router-dom';
+// import 'react-toastify/dist/ReactToastify.css';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 function MockTests() {
+  const [tests, setTests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [activeTest, setActiveTest] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState({});
   const [testResults, setTestResults] = useState(null);
+  const user = useSelector((state) => state.auth.user) || false;
+  // console.log(user);
+  const navigate= useNavigate()
+  
+  useEffect(()=>{
+    
+  },[user])
 
-  // Mock test data (replace with API data)
-  const availableTests = [
-    {
-      id: 1,
-      title: "Technical Aptitude Test",
-      description: "Test your technical knowledge with questions on programming, data structures, and algorithms.",
-      duration: 3600, // 1 hour in seconds
-      totalQuestions: 30,
-      difficulty: "medium",
-      category: "technical",
-      questions: [
-        {
-          id: 1,
-          question: "What is the time complexity of binary search?",
-          options: ["O(1)", "O(n)", "O(log n)", "O(n log n)"],
-          correctAnswer: "O(log n)"
-        },
-        // Add more questions...
-      ]
-    },
-    // Add more tests...
-  ];
+  const { time, startTimer, pauseTimer } = useTimer(activeTest?.duration || 3600);
 
-  const { time, isRunning, startTimer, pauseTimer } = useTimer(
-    activeTest?.duration || 3600
-  );
+  useEffect(() => {
+    fetchTests();
+  }, []);
 
-  const handleStartTest = (test) => {
-    setActiveTest(test);
-    setCurrentQuestionIndex(0);
-    setUserAnswers({});
-    setTestResults(null);
-    startTimer();
+  const fetchTests = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/api/v1/tests/alltests`);
+      // console.log("kya aya",response);
+      
+      setTests(response.data.data);
+      setLoading(false);
+    } catch (err) {
+      setError('Failed to load tests. Please try again later.');
+      setLoading(false);
+    }
   };
 
+    const handleStartTest = async (test) => {
+      if(user){
+   
+        // console.log("test",test);
+          // Check if the test has already been taken
+          const isTestTaken = user.testSessions.some(session => session.testId === test._id);
+          // console.log("is test laken",isTestTaken);  
+          if (isTestTaken) {
+            alert("You have already started this test. You cannot start it again.");
+            return;
+          }
+          else{
+      const response= await startTest(test._id)
+   console.log(response);
+        setActiveTest(test);
+        setCurrentQuestionIndex(0);
+        setUserAnswers({});
+        setTestResults(null);
+        startTimer();
+      }
+    }
+    else{
+      alert("please login")
+      navigate('/login')
+      return
+    }}
+
+
   const handleAnswerSelect = (questionId, answer) => {
-    setUserAnswers(prev => ({
+    setUserAnswers((prev) => ({
       ...prev,
       [questionId]: answer
     }));
@@ -53,24 +81,43 @@ function MockTests() {
 
   const handleNextQuestion = () => {
     if (currentQuestionIndex < activeTest.questions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
+      setCurrentQuestionIndex((prev) => prev + 1);
     }
   };
 
   const handlePrevQuestion = () => {
     if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => prev - 1);
+      setCurrentQuestionIndex((prev) => prev - 1);
     }
   };
 
-  const handleSubmitTest = () => {
-    pauseTimer();
-    const results = calculateTestResults(
-      Object.values(userAnswers),
-      activeTest.questions.map(q => q.correctAnswer)
-    );
-    setTestResults(results);
+  const handleSubmitTest = async () => {
+    try {
+      pauseTimer();
+      const answers = Object.values(userAnswers);
+      // console.log("active test",activeTest._id);      
+      const response = await   submitTestAnswers(activeTest._id,answers)
+      setTestResults(response.data.data);
+    } catch (err) {
+      setError('Failed to submit test. Please try again.');
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading tests...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-red-600">{error}</div>
+      </div>
+    );
+  }
 
   if (activeTest && !testResults) {
     return (
@@ -106,9 +153,9 @@ function MockTests() {
       <h1 className="text-3xl font-bold text-gray-900">Mock Tests</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {availableTests.map((test) => (
+        {tests.map((test) => (
           <TestCard
-            key={test.id}
+            key={test._id}
             test={test}
             onStart={() => handleStartTest(test)}
           />
@@ -131,7 +178,7 @@ function TestCard({ test, onStart }) {
         </div>
         <div className="flex items-center text-sm text-gray-500">
           <Brain className="h-4 w-4 mr-2" />
-          <span>{test.totalQuestions} Questions</span>
+          <span>{test.questions.length} Questions</span>
         </div>
         <div className="flex items-center text-sm text-gray-500">
           <Target className="h-4 w-4 mr-2" />
@@ -161,7 +208,6 @@ function TestInProgress({
   onSubmit
 }) {
   const currentQuestion = test.questions[currentQuestionIndex];
-  const hasAnswered = userAnswers[currentQuestion.id];
 
   return (
     <div className="space-y-6">
@@ -193,19 +239,18 @@ function TestInProgress({
             <label
               key={index}
               className={`block p-4 border rounded-lg cursor-pointer transition-colors
-                ${userAnswers[currentQuestion.id] === option
+                ${userAnswers[currentQuestion._id] === option
                   ? 'bg-indigo-50 border-indigo-500'
                   : 'hover:bg-gray-50 border-gray-200'
                 }
-              `}
-            >
+              `}>
               <div className="flex items-center">
                 <input
                   type="radio"
                   name="answer"
                   value={option}
-                  checked={userAnswers[currentQuestion.id] === option}
-                  onChange={() => onAnswerSelect(currentQuestion.id, option)}
+                  checked={userAnswers[currentQuestion._id] === option}
+                  onChange={() => onAnswerSelect(currentQuestion._id, option)}
                   className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
                 />
                 <span className="ml-3">{option}</span>
@@ -293,7 +338,7 @@ function TestResults({ results, test, onBackToTests }) {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Total Questions</span>
-              <span className="font-medium">{results.total}</span>
+              <span className="font-medium">{results.totalQuestions}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Time Taken</span>

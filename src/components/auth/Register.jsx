@@ -1,7 +1,3 @@
-// import React, { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import { useAuth } from '../context/AuthContext';
-
 import React, { useState } from "react";
 import Inputfield from "../Inputfield";
 import { useForm } from "react-hook-form";
@@ -31,21 +27,10 @@ function Register() {
       const userData = await registerUser(data);
 
       if (userData) {
-        // const email = data.email;
-        // const obj = { email };
-        // dispatch(VerifyEmail(obj));
-        // navigate("/verifyotp");
-
-        const user = userData.data;
-        const obj = { user };
-        dispatch(login(obj));
-
-        toast.success('Signup successful! Redirecting to login...');
-
-          setTimeout(() => {
-            setLoading(false);
-            navigate('/login');
-          }, 1500);
+        const email = data.email;
+        const obj = { email };
+        dispatch(VerifyEmail(obj));
+        navigate("/verifyotp");
       }
     } catch (error) {
       const errorMessage =

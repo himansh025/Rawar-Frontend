@@ -1,6 +1,5 @@
 
-
-function ProgressBar({ icon, label, value, total, showPercentage = false }) {
+export default function ProgressBar({ icon, label, value, total, showPercentage = false }) {
     const percentage = Math.round((value / total) * 100);
     
     return (
@@ -21,4 +20,3 @@ function ProgressBar({ icon, label, value, total, showPercentage = false }) {
       </div>
     );
   }
-  export default ProgressBar
