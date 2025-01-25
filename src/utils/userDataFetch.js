@@ -43,6 +43,32 @@ const loginUser = async (formData) => {
     }
   }
 };
+const adminlogin = async (formData) => {
+  try {
+    console.log("Login form data:", formData);
+
+    const response = await axios.post(
+      `${apiUrl}/api/v1/admin/login`,
+      formData,
+
+      { withCredentials: true }
+    );
+
+    console.log("Login response:", response.data);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      console.error("Server error:", error.response.data);
+      alert(error.response.data.message || "An error occurred. Please try again.");
+    } else if (error.request) {
+      console.error("No response from server:", error.request);
+      alert("No response from the server. Please check your connection.");
+    } else {
+      console.error("Error in request setup:", error.message);
+      alert("An unexpected error occurred.");
+    }
+  }
+};
 
 const callchatbot = async (data) => {
   console.log(data);
@@ -175,5 +201,6 @@ export {
   getUserProfileStats,
   refreshAccessToken,
   verifyOtp,
-  callchatbot
+  callchatbot,
+  adminlogin
 }

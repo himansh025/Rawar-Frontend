@@ -57,7 +57,6 @@ const getQuestionById = async (id) => {
 // Submit an answer for a question
 export const submitQuestionState = async (questionState) => {
   console.log("Submitting Question State:", questionState);
-
   try {
     const response = await axios.post(`${apiUrl}/api/v1/questions/SubResult`, questionState, {
       headers: {
@@ -68,16 +67,6 @@ export const submitQuestionState = async (questionState) => {
     console.log("Response from server:", response);
     return response.data; // Return the response data
   } catch (error) {
-    console.error("Error submitting answer for question:", error);
-
-    if (error.response) {
-      console.error("Response error:", error.response);
-    } else if (error.request) {
-      console.error("Request error:", error.request);
-    } else {
-      console.error("General error:", error.message);
-    }
-
     throw new Error('Failed to submit answer. Please try again.');
   }
 };

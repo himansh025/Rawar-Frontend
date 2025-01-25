@@ -10,6 +10,7 @@ function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+console.log(user.role);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -33,7 +34,10 @@ function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex md:space-x-8 items-center">
-            <NavLink to="/" icon={<Layout className="h-5 w-5" />} text="Dashboard" />
+            {user.role=="admin"?(
+              <NavLink to="/admindashboard" icon={<Layout className="h-5 w-5" />} text="Admin DashBoard" />
+            ): <  NavLink to="/" icon={<Layout className="h-5 w-5" />} text="Dashboard" />}
+         
             <NavLink to="/questions" icon={<BookOpen className="h-5 w-5" />} text="Questions" />
             <NavLink to="/mocktests" icon={<TestTube2 className="h-5 w-5" />} text="Mock Tests" />
             <NavLink to="/leaderboard" icon={<Trophy className="h-5 w-5" />} text="Leaderboard" />
@@ -64,13 +68,16 @@ function Navbar() {
               </>
             ) : (
               <>
-                <Link
-                  to="/userprofile"
-                  className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-                >
-                  <User className="h-5 w-5" />
-                  <span className="ml-2">Profile</span>
-                </Link>
+              {user.role=="user"?(
+              <Link
+              to="/userprofile"
+              className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+            >
+              <User className="h-5 w-5" />
+              <span className="ml-2">Profile</span>
+            </Link>
+           ):null}
+             
                 <button
                   onClick={handleLogout}
                   className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"

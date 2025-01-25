@@ -5,17 +5,17 @@ import Dashboard from './pages/Dashboard';
 import QuestionBank from './pages/QuestionBank';
 import QuestionSolver from './components/QuestionSolver'
 import MockTests from './pages/MockTests';
-// import LeaderBoard from './pages/LeaderBoard';
+import LeaderBoard from './pages/LeaderBoard';
+// import AdminPage from './pages/AdminPage';
 import UserProfile from './pages/UserProfile';
 import { Verifyotp } from './components/VerifyOtp';
 import Login from './components/auth/Login';
 import {AdminAuth} from './components/auth/AdminAuth';
 import {Logout} from './components/auth/Logout';
 import Register from './components/auth/Register';
-// import { toast } from 'react-toastify';
 // import Chatbot from './components/Chatbot';
-// toast.configure();
-
+import AdminDashboard from './pages/AdminDashboard';
+import MockTestManagement from './components/MockTestManagement'
 function App() {
   return (
     <Router>
@@ -27,7 +27,11 @@ function App() {
             <Route path="/questions" element={<QuestionBank />}/ >
             <Route path="/questionsolver" element={<QuestionSolver />} />
             <Route path="/mocktests" element={<MockTests />} />
-            {/* <Route path="/leaderboard" element={<LeaderBoard />} /> */}
+            {/* <Route path="/adminpage" element={<AdminPage />} /> */}
+            <Route path="/admindashboard" element={<AdminDashboard />} />
+            <Route path="/adminlogin" element={<AdminAuth />} />
+            <Route path="/work" element={<MockTestManagement />} />
+            <Route path="/leaderboard" element={<LeaderBoard />} />
             <Route path="/userprofile" element={<UserProfile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/verifyotp" element={<Verifyotp />} />

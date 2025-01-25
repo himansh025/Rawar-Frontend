@@ -9,18 +9,16 @@ import axios from 'axios'
 
 function UserProfile({ userId }) {
   const [userStats, setUserStats] = useState(null);
-  // const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const user = useSelector((state) => state.auth.user);
-const [testlenght,settestlength]= useState(0)
+const [totaltestconduct,settotaltestconduct]= useState(0)
   
   const fetchTests = async () => {
     try {
       const response = await axios.get(`${apiUrl}/api/v1/tests/alltests`);
     let  len = response.data.data.length;
-      // console.log(response);
-      settestlength(len)
-console.log(len); 
+    console.log(len); 
+    settotaltestconduct(len)
 }
     catch (err) {
       console.log(err);
@@ -51,10 +49,14 @@ console.log(len);
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        if(user){
         const { data, success } = await getCurrentUser();
         const  statsData = await getUserProfileStats();
-        // console.log("states",statsData);
+        console.log("states",statsData);
+        console.log("user",data.progress);
+
         const stats= statsData.stats
+        // settestlength(data.progress.testsTaken)
         if (success) {
           setUserStats({
             name: data.name,
@@ -67,8 +69,8 @@ console.log(len);
             stats: {
               rank:stats.rank,
               accuracyRate:stats.accuracyRate,
-              completedQuestions: stats.completedQuestions|| 0,
-              correctAnswers: stats.correctAnswersCount|| 0,
+              completedQuestions: data.progress.completedQuestions|| 0,
+              correctAnswers: data.progress.correctAnswers|| 0,
               testsTaken: data.progress.testsTaken || 0,
               averageScore: stats.completedQuestions
                 ? Math.round((stats.correctAnswersCount / stats.completedQuestions) * 100)
@@ -78,7 +80,7 @@ console.log(len);
 // console.log(userStats.avatar);
         } else {
           console.error('Failed to fetch user data');
-        }
+        }}
       } catch (error) {
         console.error('Error fetching user data:', error);
       } finally {
@@ -132,50 +134,57 @@ fetchTests()
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <StatesCard
-          icon={<Target className="h-6 w-6 text-indigo-600" />}
-          title="Accuracy Rate"
-          value={`${userStats.stats.accuracyRate}%`}
-        />
-        <StatesCard
-          icon={<Award className="h-6 w-6 text-indigo-600" />}
-          title="Current Rank"
-          value={`#${userStats.stats.rank}`}
-        />
-  
-      </div>
+      {user.role=="user"?(
 
-      {/* Progress and Recent Activities */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Progress Section */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-lg font-semibold mb-4">Your Progress</h2>
-          <div className="space-y-4">
-            <ProgressBar
-              icon={<BookOpen className="h-5 w-5" />}
-              label="Questions Completed"
-              value={userStats.stats.completedQuestions}
-              total={200}
-            />
-              <ProgressBar
-              icon={<Check className="h-5 w-5" />}
-              label="Questions Correct"
-              value={userStats.stats.correctAnswers}
-              total={200}
-            />
-            <ProgressBar
-              icon={<Brain className="h-5 w-5" />}
-              label="Tests Completed"
-              value={userStats.stats.testsTaken}
-              total={20}
-            />
+   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+   <StatesCard
+     icon={<Target className="h-6 w-6 text-indigo-600" />}
+     title="Accuracy Rate"
+     value={`${userStats.stats.accuracyRate}%`}
+   />
+   <StatesCard
+     icon={<Award className="h-6 w-6 text-indigo-600" />}
+     title="Current Rank"
+     value={`#${userStats.stats.rank}`}
+   />
+
+ </div>
+ 
+):null
+}
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+     
+     <div className="bg-white rounded-lg shadow-md p-6">
+       <h2 className="text-lg font-semibold mb-4">Your Progress</h2>
+       <div className="space-y-4">
+         <ProgressBar
+           icon={<BookOpen className="h-5 w-5" />}
+           label="Questions Completed"
+           value={userStats.stats.completedQuestions && user.role=="user"}
+           total={200}
+         />
+           <ProgressBar
+           icon={<Check className="h-5 w-5" />}
+           label="Questions Correct"
+           value={userStats.stats.correctAnswers  }
+           total={200}
+         />
+         <ProgressBar
+           icon={<Brain className="h-5 w-5" />}
+           label="Tests Completed"
+           value={userStats.stats.testsTaken}
+           total={totaltestconduct}
+         />
     
-          </div>
-        </div>
-
-      </div>
+       </div>
+     </div>
+    
     </div>
+     
+</div>
+   
+
+      
   );
 }
 

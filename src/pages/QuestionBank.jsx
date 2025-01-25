@@ -55,8 +55,13 @@ if(user){
 
   const handleNextQuestion = () => {
     const currentIndex = questions.findIndex((q) => q._id === selectedQuestion._id);
-    const nextQuestion = questions[currentIndex + 1] || questions[0];
+    const nextQuestion = questions[currentIndex + 1] 
+
+ if(nextQuestion) {
     handleSolveClick(nextQuestion);
+  } else {
+    alert("No more questions available.");
+  }
   };
 
   const filteredQuestions = questions.filter((question) => {
@@ -120,7 +125,10 @@ if(user){
               type="text"
               placeholder="Search questions..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                // Update the state to the current input value
+                setSearchQuery(e.target.value);
+              }}
               className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm"
             />
           </div>

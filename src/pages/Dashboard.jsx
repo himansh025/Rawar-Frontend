@@ -6,13 +6,15 @@ import StatesCard from '../components/StatesCard';
 import ProgressBar from '../components/ProgressBar';
 import { BookOpen, Clock, Brain, Award, User, Check } from 'lucide-react';
 const apiUrl = import.meta.env.VITE_API_URL;
-import {getResult} from '../utils/questionDataFetch.js'
+import {getCurrentUser} from '../utils/userDataFetch.js'
 
 const Dashboard = () => {
   const user = useSelector((state) => state.auth.user);
   const [questions, setQuestions] = useState([]);
   const [mockTests, setMockTests] = useState([]);
-console.log(user);
+  const [progressData, setprogressData] = useState([]);
+
+// console.log(user);
 
   // Fetch Questions and Tests
   useEffect(() => {
@@ -24,27 +26,47 @@ console.log(user);
           // axios.get(`${apiUrl}/api/v1/questions/getResult`)
 
         ]);
-        const result= await getResult()
-        console.log(questionsRes.data);
-        console.log(test);
-        console.log(result);
+
+        if(user){
+          const result= await getCurrentUser()
+        // console.log(questionsRes.data);
+        // console.log(test);
+          setprogressData(result.data)
+          // console.log(progressData);
         
         
         setQuestions(questionsRes.data || []);
         setMockTests(test.data.data || []);
-      } catch (error) {
+      }} catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
     fetchData();
-  }, [apiUrl]);
+  
+  }, [apiUrl,user]);
+
+
+  // const progress = { completedQuestions: 8, correctAnswers: 7, testsTaken: 2 };
+
+const calculateSuccessRate = (comp,correct) => {
+  console.log(comp,correct);
+  
+  // const { completedQuestions, co   } = progress;
+  if (comp === 0) {
+    return 0; // Avoid division by zero
+  }
+  const successRate = (correct / comp) * 100;
+  return successRate.toFixed(2); // Return as a string with 2 decimal places
+};
+
+// console.log(`Success Rate: ${calculateSuccessRate(comp,correct)}%`);
 
   // Stats Data
   const stats = [
-    { label: 'Questions Solved', value: user?.progress?.completedQuestions || 0, total: 200, icon: BookOpen, color: 'text-blue-500' },
-    { label: 'Tests Taken', value: user?.progress?.testsTaken || 0, total: 20, icon: Clock, color: 'text-purple-500' },
-    { label: 'Success Rate', value: user?.stats?.accuracyRate || 0, icon: Brain, color: 'text-green-500' },
+    { label: 'Questions Solved', value: progressData?.progress?.completedQuestions || 0, total: 200, icon: BookOpen, color: 'text-blue-500' },
+    { label: 'Tests Taken', value: progressData?.progress?.testsTaken || 0, total: 20, icon: Clock, color: 'text-purple-500' },
+    { label: 'Success Rate', value: calculateSuccessRate(progressData?.progress?.completedQuestions,progressData?.progress?.correctAnswers) || 0, icon: Brain, color: 'text-green-500' },
     { label: 'Current Rank', value: `#${user?.stats?.rank || 0}`, icon: Award, color: 'text-orange-500' },
   ];
 

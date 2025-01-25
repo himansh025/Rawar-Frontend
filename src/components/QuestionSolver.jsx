@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import {submitQuestionState} from '../utils/questionDataFetch.js'
+import { submitQuestionState } from '../utils/questionDataFetch.js';
 function QuestionSolver({ question, onBack, onNext }) {
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [isAnswered, setIsAnswered] = useState(false);
@@ -11,34 +11,28 @@ function QuestionSolver({ question, onBack, onNext }) {
     incorrectAnswers: 0,
     questionsAttempted: new Set(),
   });
-
+  
+  // const [pendingSubmission, setPendingSubmission] = useState(null);
+  // const [submissionTimeout, setSubmissionTimeout] = useState(null);
+  
   const handleSubmit = async () => {
+    if (submissionStats.questionsAttempted.has(question._id)) {
+      alert("You have already attempted this question.");
+      return;
+    }
     const isCorrect = selectedAnswer === question.correctAnswer;
-    
+  
     // Update submission stats
-    setSubmissionStats(prev => {
+    setSubmissionStats((prev) => {
       const newStats = {
         totalAttempts: prev.totalAttempts + 1,
         correctAnswers: prev.correctAnswers + (isCorrect ? 1 : 0),
         incorrectAnswers: prev.incorrectAnswers + (isCorrect ? 0 : 1),
-        questionsAttempted: new Set([...prev.questionsAttempted, question._id])
+        questionsAttempted: new Set(prev.questionsAttempted).add(question._id),
       };
-      
-      // Store stats in localStorage for persistence
-      // localStorage.setItem('quizStats', JSON.stringify({
-      //   ...newStats,
-      //   questionsAttempted: Array.from(newStats.questionsAttempted)
-      // }));
-      
-      const callsubmit= async()=>{
-        const res= await submitQuestionState(submissionStats)
-        console.log("res submitted",res);
-        
-      } 
-      callsubmit();
       return newStats;
     });
-
+  
     // Prepare submission data
     const submissionData = {
       questionId: question._id,
@@ -51,42 +45,41 @@ function QuestionSolver({ question, onBack, onNext }) {
         totalAttempts: submissionStats.totalAttempts + 1,
         correctAnswers: submissionStats.correctAnswers + (isCorrect ? 1 : 0),
         incorrectAnswers: submissionStats.incorrectAnswers + (isCorrect ? 0 : 1),
-      }
+      },
     };
-
-    try {
-      // Send submission data to the backend
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/submissions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        },
-        body: JSON.stringify(submissionData)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save submission');
-      }
-    } catch (error) {
-      console.error('Error saving submission:', error);
-    }
-
+  
+    // setPendingSubmission(submissionData);
+    console.log("subsmissision data",submissionData);
+  
+    // Clear existing timeout and set a new one
+    // if (submissionTimeout) clearTimeout(submissionTimeout);
+    // const newTimeout = setTimeout(async () => {
+      const response= await submitQuestionState(submissionData)
+      console.log("res for submit question",response);
+        if (!response) throw new Error("Failed to save submission");
+        console.log("Submission saved:", response.data);
+        
+  
     setFeedback({
       isCorrect,
       message: isCorrect
-        ? 'Correct! Great job!'
+        ? "Correct! Great job!"
         : `Incorrect. The correct answer is: ${question.correctAnswer}`,
       stats: {
         totalAttempts: submissionStats.totalAttempts + 1,
         correctAnswers: submissionStats.correctAnswers + (isCorrect ? 1 : 0),
         incorrectAnswers: submissionStats.incorrectAnswers + (isCorrect ? 0 : 1),
-      }
+      },
     });
     setIsAnswered(true);
   };
+  
 
   const handleNext = () => {
+    if (!isAnswered) {
+      alert("Please submit your answer before moving to the next question.");
+      return;
+    }
     setSelectedAnswer('');
     setIsAnswered(false);
     setFeedback(null);

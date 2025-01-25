@@ -1,11 +1,15 @@
-import React, { useState,useEffect } from 'react';
-import Inputfield from '../Inputfield';
+import React, { useEffect, useState } from 'react';
+import Inputfield from '../Inputfield.jsx';
+import { adminlogin } from '../../utils/userDataFetch.js';
 import { useForm } from "react-hook-form";
 import Button from '../Button';
+// import {login} from '../utils/userDataFetch';
 import { login } from '../../store/authSlice.js';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { load, stopLoad } from '../../store/reloadSlice.js';
+
 const AdminAuth = () => {
   const { register, handleSubmit } = useForm();
   const [loading, setLoading] = useState(false);
@@ -13,35 +17,42 @@ const AdminAuth = () => {
   const dispatch = useDispatch();
   const [accessToken, setAccessToken] = useState("jbkkhbm");
   Cookies.set('accessToken', accessToken);
+  const user= useSelector((state)=>state.auth.user)
 
-  useEffect(() => {
-  }, [accessToken]);
+  // useEffect(() => {
+  // }, [accessToken]);
+  console.log("isadmin",user);
+  
 
   const onSubmit = async (data, e) => {
     e.preventDefault();
     setLoading(true); // Start loading
+    dispatch(load());
 
     try {
-      const userdata = await loginUser(data);
-      if(userdata.isAdmin){
-  //  console.log(userd);
+      const userdata = await adminlogin(data);
+      console.log("data",userdata);
+       
+      if(userdata.data.role){
    
         localStorage.setItem('accessToken', userdata.data.accesstoken);
         localStorage.setItem('refreshToken', userdata.data.refreshtoken);
-        const user = userdata.data.user;
+        const user = userdata.data;
+        console.log(user);
         
         dispatch(login({ user }));
-        navigate('/');}
+        navigate('/admindashboard');}
       else {
         setLoading(false);
         alert("Please check your credentials.");
-        navigate('/login');
+        // navigate('/');
       }
     } catch (error) {
       console.error("Login error:", error);
       setLoading(false);
       alert("An error occurred during login. Please try again.");
     } finally {
+      dispatch(stopLoad());
       setLoading(false);
     }
   };
