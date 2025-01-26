@@ -26,7 +26,6 @@ const TestManagement = () => {
     difficulty: "",
     title: "",
     description: "",
-    difficulty: "",
     question:"",
     options: ["","","",""],
     correctAnswer:"",
