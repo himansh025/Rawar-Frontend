@@ -18,12 +18,10 @@ function MockTests() {
   const [userAnswers, setUserAnswers] = useState({});
   const [testResults, setTestResults] = useState(null);
   const user = useSelector((state) => state.auth.user) || false;
-  // console.log(user);
+  let userid= user._id
+  // console.log(userid);
   const navigate= useNavigate()
   
-  useEffect(()=>{
-    
-  },[user])
 
   const { time, startTimer, pauseTimer } = useTimer(activeTest?.duration || 3600);
 
@@ -34,7 +32,7 @@ function MockTests() {
   const fetchTests = async () => {
     try {
       const response = await axios.get(`${apiUrl}/api/v1/tests/alltests`);
-      // console.log("kya aya",response);
+      console.log("kya aya",response);
       
       setTests(response.data.data);
       setLoading(false);
@@ -47,23 +45,25 @@ function MockTests() {
     const handleStartTest = async (test) => {
       if(user){
    
-        // console.log("test",test);
+        console.log("test",test);
           // Check if the test has already been taken
-          const isTestTaken = user.testSessions.some(session => session.testId === test._id);
+          console.log("user",user);
+
+          const isTestTaken = user?.testSessions.some(session => session.testId === test._id);
           // console.log("is test laken",isTestTaken);  
           if (isTestTaken) {
             alert("You have already started this test. You cannot start it again.");
             return;
           }
-          else{
-      const response= await startTest(test._id)
+         
+      const response= await startTest(test._id,user._id)
    console.log(response);
         setActiveTest(test);
         setCurrentQuestionIndex(0);
         setUserAnswers({});
         setTestResults(null);
         startTimer();
-      }
+      
     }
     else{
       alert("please login")
@@ -72,7 +72,9 @@ function MockTests() {
     }}
 
 
-  const handleAnswerSelect = (questionId, answer) => {
+  const handleAnswerSelect = (questionId, answer,) => {
+    console.log("question ans",questionId,answer);
+    
     setUserAnswers((prev) => ({
       ...prev,
       [questionId]: answer
@@ -94,15 +96,20 @@ function MockTests() {
   const handleSubmitTest = async () => {
     try {
       pauseTimer();
+      console.log(userAnswers);
+  
       const answers = Object.values(userAnswers);
-      // console.log("active test",activeTest._id);      
-      const response = await   submitTestAnswers(activeTest._id,answers)
+      console.log("User ID:", userid);
+      console.log("Active Test ID:", activeTest._id);
+  
+      const response = await submitTestAnswers(activeTest._id, answers, userid);
       setTestResults(response.data.data);
     } catch (err) {
+      console.error('Error submitting test:', err);
       setError('Failed to submit test. Please try again.');
     }
   };
-
+  
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">

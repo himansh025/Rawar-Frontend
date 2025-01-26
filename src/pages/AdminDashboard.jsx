@@ -2,29 +2,33 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { login } from '../store/authSlice';
+import { Aperture } from 'lucide-react';
+const API_URL = import.meta.env.VITE_API_URL 
 
 const AdminDashboard = () => {
-    const [users, setUsers] = useState([]);
-    const [faculties, setFaculties] = useState([]);
-    const [mockTests, setMockTests] = useState([]);
+    const [users, setUsers] = useState([""]);
+    const [faculties, setFaculties] = useState([""]);
+    const [mockTests, setMockTests] = useState([""]);
     const navigate = useNavigate();
-    const user= useSelector((state)=>state)
+    // const user= useSelector((state)=>state)
 
     useEffect(() => {
+  
         const fetchData = async () => {
             try {
-                const userResponse = await axios.get('/api/v1/user');
-                const facultyResponse = await axios.get('/api/admin/faculties');
-                const mockTestsResponse = await axios.get('/api/mock-tests');
+                const userResponse = await axios.get(`${API_URL}/api/v1/admin/users`);
+                const facultyResponse = await axios.get(`${API_URL}/api/v1/admin/faculties`);
+                const mockTestsResponse = await axios.get(`${API_URL}/api/v1/tests/alltests`);
+console.log("user",userResponse);
 
-                setUsers(userResponse.data);
+                setUsers(userResponse?.data?.data?.length);
                 setFaculties(facultyResponse.data);
                 setMockTests(mockTestsResponse.data);
             } catch (error) {
                 console.error('Error fetching data', error);
             }
         };
-
         fetchData();
     }, []);
 
@@ -103,25 +107,17 @@ const AdminDashboard = () => {
                     style={styles.button}
                     onMouseOver={(e) => (e.target.style.backgroundColor = '#0056b3')}
                     onMouseOut={(e) => (e.target.style.backgroundColor = '#007bff')}
-                    onClick={() => navigate('/work')}
+                    onClick={() => navigate("/admin/work/mocktest")}
                 >
-                    Add Mock Test
+                    Handle MockTest
                 </button>
                 <button
                     style={styles.button}
                     onMouseOver={(e) => (e.target.style.backgroundColor = '#0056b3')}
                     onMouseOut={(e) => (e.target.style.backgroundColor = '#007bff')}
-                    onClick={() => navigate('/work')} //not set routing
+                    onClick={() => navigate("/admin/work/question")}//not set routing
                 >
-                    Add Aptitude Questrions
-                </button>
-                <button
-                    style={styles.button}
-                    onMouseOver={(e) => (e.target.style.backgroundColor = '#0056b3')}
-                    onMouseOut={(e) => (e.target.style.backgroundColor = '#007bff')}
-                    onClick={() => navigate('/work')}  //not set routing
-                >
-                    Update  Mock Test   
+                    Handle Apptitude Questions
                 </button>
                 </div>
             </div>
@@ -132,7 +128,7 @@ const AdminDashboard = () => {
             </div> */}
             <div style={styles.dashboardColumns}>
                 <section style={styles.section}>
-                    <h2 style={styles.sectionHeader}>Users ({users.count || 0})</h2>
+                    <h2 style={styles.sectionHeader}> Total Users ({users || 0})</h2>
                     <ul style={styles.list}>
                         {users.users && users.users.map((user) => (
                             <li style={styles.listItem} key={user.id}>

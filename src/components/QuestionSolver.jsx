@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { submitQuestionState } from '../utils/questionDataFetch.js';
-function QuestionSolver({ question, onBack, onNext }) {
+// import { use } from 'react';
+function QuestionSolver({ question, onBack, onNext,user }) {
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [isAnswered, setIsAnswered] = useState(false);
   const [feedback, setFeedback] = useState(null);
@@ -11,6 +12,8 @@ function QuestionSolver({ question, onBack, onNext }) {
     incorrectAnswers: 0,
     questionsAttempted: new Set(),
   });
+  console.log(user);
+  
   
   // const [pendingSubmission, setPendingSubmission] = useState(null);
   // const [submissionTimeout, setSubmissionTimeout] = useState(null);
@@ -50,11 +53,12 @@ function QuestionSolver({ question, onBack, onNext }) {
   
     // setPendingSubmission(submissionData);
     console.log("subsmissision data",submissionData);
+    console.log("subsmissision data");
   
     // Clear existing timeout and set a new one
     // if (submissionTimeout) clearTimeout(submissionTimeout);
     // const newTimeout = setTimeout(async () => {
-      const response= await submitQuestionState(submissionData)
+      const response= await submitQuestionState(submissionData,user)
       console.log("res for submit question",response);
         if (!response) throw new Error("Failed to save submission");
         console.log("Submission saved:", response.data);

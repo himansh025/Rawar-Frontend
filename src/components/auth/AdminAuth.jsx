@@ -41,7 +41,7 @@ const AdminAuth = () => {
         console.log(user);
         
         dispatch(login({ user }));
-        navigate('/admindashboard');}
+        navigate('/admin');}
       else {
         setLoading(false);
         alert("Please check your credentials.");
@@ -58,8 +58,8 @@ const AdminAuth = () => {
   };
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-gradient-to-r mt-10 from-blue-500 via-indigo-300 to-purple-300'>
-      <div className='p-8 w-[90%] md:w-[400px] bg-white shadow-lg rounded-3xl border-2 border-gray-200'>
+    <div className='min-h-screen flex items-center justify-center bg-gradient-to-r mt-10 from-blue-00 via-indigo-300 to-purple-300'>
+      <div className='p-8 w-[90%] md:w-[400px] bg-slate-500 shadow-lg rounded-3xl border-2 border-gray-200'>
         <div className='text-center text-4xl font-semibold mb-8 text-gray-800'>
           Admin Login
         </div>

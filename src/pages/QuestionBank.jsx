@@ -14,6 +14,7 @@ function QuestionBank() {
   const [error, setError] = useState(null);
   const user = useSelector((state) => state.auth.user) || false;
   const navigate= useNavigate()
+console.log(user._id);
 
   // Fetch questions based on filters
   useEffect(() => {
@@ -89,11 +90,12 @@ if(user){
           question={selectedQuestion}
           onNext={handleNextQuestion}
           onBack={() => setSelectedQuestion(null)}
+          user={user._id}
         />
       ) : (
         <>
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
-            <h1 className="text-3xl font-bold text-gray-900">Question Bank</h1>
+            <h1 className="text-3xl font-bold  text-white">Question Bank</h1>
             <div className="flex space-x-4">
               <select
                 value={selectedCategory}
@@ -137,8 +139,8 @@ if(user){
               <li key={question._id} className="p-4 hover:bg-gray-50">
                 <div className="flex justify-between items-center">
                   <div className="flex-1">
-                    <h3 className="font-medium text-gray-900">{question.title}</h3>
-                    <p className="text-sm text-gray-500 mt-1">{question.description}</p>
+                    <h3 className="font-medium text-gray-400">{question.title}</h3>
+                    <p className="text-sm text-gray-400 mt-1">{question.description}</p>
                     <div className="flex gap-2 mt-2">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         {question.category}

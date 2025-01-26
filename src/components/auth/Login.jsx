@@ -61,8 +61,8 @@ function Login() {
 
   return (
     <div className='min-h-screen flex items-center  justify-center '>
-    <div className='p-8 w-[90%] md:w-[400px] bg-white text-gray-900 mx-auto rounded-3xl shadow-2xl'>
-      <div className='text-center text-4xl font-semibold mb-6'>
+    <div className='p-8 w-[90%] md:w-[400px] bg-gray-800 text-gray-900 mx-auto rounded-3xl shadow-2xl'>
+      <div className='text-center text-gray-200 text-4xl font-semibold mb-6'>
         Welcome Back
       </div>
       <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6'>
@@ -91,10 +91,10 @@ function Login() {
         />
       </form>
       <div className="text-center mt-6">
-        <span className="text-sm text-gray-500">Don't have an account? </span>
+        <span className="text-sm text-red-600">Don't have an account? </span>
         <button 
           onClick={handleclick} 
-          className="text-sm text-blue-500 hover:text-blue-700">
+          className="text-sm text-red-600 hover:text-blue-700">
           Sign Up
         </button>
       </div>

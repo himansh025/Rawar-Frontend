@@ -35,12 +35,12 @@ console.log(user.role);
           {/* Desktop Navigation */}
           <div className="hidden md:flex md:space-x-8 items-center">
             {user.role=="admin"?(
-              <NavLink to="/admindashboard" icon={<Layout className="h-5 w-5" />} text="Admin DashBoard" />
+              <NavLink to="/admin/admindashboard" icon={<Layout className="h-5 w-5" />} text="Admin DashBoard" />
             ): <  NavLink to="/" icon={<Layout className="h-5 w-5" />} text="Dashboard" />}
          
-            <NavLink to="/questions" icon={<BookOpen className="h-5 w-5" />} text="Questions" />
-            <NavLink to="/mocktests" icon={<TestTube2 className="h-5 w-5" />} text="Mock Tests" />
-            <NavLink to="/leaderboard" icon={<Trophy className="h-5 w-5" />} text="Leaderboard" />
+            <NavLink to="/user/questions" icon={<BookOpen className="h-5 w-5" />} text="Questions" />
+            <NavLink to="/user/mocktests" icon={<TestTube2 className="h-5 w-5" />} text="Mock Tests" />
+            {/* <NavLink to="/leaderboard" icon={<Trophy className="h-5 w-5" />} text="Leaderboard" /> */}
           </div>
 
           {/* User Authentication Section */}
@@ -49,18 +49,18 @@ console.log(user.role);
               <>
                 <Link
                   to="/login"
-                  className="px-4 py-2 text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50"
+                  className="px-3 py-1 text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50"
                 >
                   Login
                 </Link>
                 <Link
                   to="/signup"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 >
                   Signup
                 </Link>
                 <Link
-                  to="/adminauth"
+                  to="/adminlogin"
                   className="px-3 py-1 bg-blue-600 hidden md:hidden lg:block text-white rounded-md hover:bg-blue-700" // Corrected class 
                 >
                   Admin
@@ -70,13 +70,14 @@ console.log(user.role);
               <>
               {user.role=="user"?(
               <Link
-              to="/userprofile"
+              to="/user/userprofile"
               className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
             >
               <User className="h-5 w-5" />
               <span className="ml-2">Profile</span>
             </Link>
-           ):null}
+           ):(<>
+           </>) }
              
                 <button
                   onClick={handleLogout}
@@ -105,12 +106,12 @@ console.log(user.role);
         <MobileNavLink to="/" text="Home" onClick={toggleMobileMenu} />
         <MobileNavLink to="/questions" text="Questions" onClick={toggleMobileMenu} />
         <MobileNavLink to="/mocktests" text="Mock Tests" onClick={toggleMobileMenu} />
-        <MobileNavLink to="/leaderboard" text="Leaderboard" onClick={toggleMobileMenu} />
+        {/* <MobileNavLink to="/leaderboard" text="Leaderboard" onClick={toggleMobileMenu} /> */}
         {!user ? (
           <div className="space-y-2">
             <MobileNavLink to="/login" text="Login" onClick={toggleMobileMenu} />
             <MobileNavLink to="/signup" text="Signup" onClick={toggleMobileMenu} />
-            <MobileNavLink to="/admin" text="Admin" onClick={toggleMobileMenu} />
+            <MobileNavLink to="/adminlogin" text="Admin" onClick={toggleMobileMenu} />
           </div>
         ) : (
           <button
@@ -140,8 +141,7 @@ function NavLink({ to, icon, text }) {
     </Link>
   );
 }
-
-// Mobile Navigation Link Component
+// mobile
 function MobileNavLink({ to, text, onClick }) {
   return (
     <Link

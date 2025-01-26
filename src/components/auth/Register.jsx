@@ -43,21 +43,16 @@ function Register() {
   };
 
   return (
-    <div className="max-w-md mx-auto rounded-3xl shadow-2xl mt-10">
+    <div className="max-w-md mx-auto rounded-3xl bg-slate-800 shadow-2xl mt-10">
       <h2 className="text-3xl font-bold text-center mb-8 mt-5 pt-5">
         Create Account
       </h2>
-      {/* {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
-      )} */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-       
       <Inputfield
     placeholder="Enter FullName"
     name="name"
     type="text"
+    label="Name"
     register={register}
     required
     className="mt-1 block w-full rounded-lg border border-gray-400 shadow-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 bg-white py-3 px-4 text-base text-gray-800 placeholder-gray-500"
@@ -71,8 +66,6 @@ function Register() {
             required
             className="mt-1 block w-full rounded-lg border border-gray-400 shadow-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 bg-white py-3 px-4 text-base text-gray-800 placeholder-gray-500"
             />
-      
-     
           <Inputfield
             placeholder="Enter your password"
             name="password"

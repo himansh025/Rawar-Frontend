@@ -20,11 +20,10 @@ const fetchQuestions = async (params) => {
   }
 };
 
-const getResult = async () => {
+const getResult = async (userid) => {
   try {
-    const response = await fetch(`${apiUrl}/api/v1/questions/getResult`,{
+    const response = await fetch(`${apiUrl}/api/v1/questions/getResult`,userid,{
       headers: {
-        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       }});
     if (!response.ok) {
@@ -55,14 +54,12 @@ const getQuestionById = async (id) => {
 };
 
 // Submit an answer for a question
-export const submitQuestionState = async (questionState) => {
+export const submitQuestionState = async (questionState,userid) => {
   console.log("Submitting Question State:", questionState);
   try {
-    const response = await axios.post(`${apiUrl}/api/v1/questions/SubResult`, questionState, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
+    const response = await axios.post(`${apiUrl}/api/v1/questions/SubResult`, {questionState,userid}, {
+      headers:         {"Content-Type": "application/json",
+      }
     });
     console.log("Response from server:", response);
     return response.data; // Return the response data

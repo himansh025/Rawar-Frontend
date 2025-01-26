@@ -55,6 +55,11 @@ const [totaltestconduct,settotaltestconduct]= useState(0)
         console.log("states",statsData);
         console.log("user",data.progress);
 
+        const calculateSuccessRate = (completed, correct) => {
+          if (completed === 0) return 0;
+          return ((correct / completed) * 100).toFixed(2);
+        };
+    
         const stats= statsData.stats
         // settestlength(data.progress.testsTaken)
         if (success) {
@@ -68,13 +73,13 @@ const [totaltestconduct,settotaltestconduct]= useState(0)
             }),
             stats: {
               rank:stats.rank,
-              accuracyRate:stats.accuracyRate,
+              accuracyRate:calculateSuccessRate(
+                data?.progress?.completedQuestions ||0,
+                data?.progress?.correctAnswers||0
+              ),
               completedQuestions: data.progress.completedQuestions|| 0,
               correctAnswers: data.progress.correctAnswers|| 0,
               testsTaken: data.progress.testsTaken || 0,
-              averageScore: stats.completedQuestions
-                ? Math.round((stats.correctAnswersCount / stats.completedQuestions) * 100)
-                : 0,
               rank: 42            },
           });
 // console.log(userStats.avatar);
@@ -95,17 +100,17 @@ fetchTests()
   if (!userStats) return <div>No user data available.</div>;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <div className="flex items-center space-x-4">
-          <div className="relative group">
+    <div className="max-w-7xl bg-gray-900 mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6 bg-gradient-to-r from-indigo-500 to-purple-500">
+        <div className="flex items-center space-x-4 ">
+          <div className="relative group ">
             <label htmlFor="avatar" className="relative block cursor-pointer">
-              <div className="h-20 w-20 rounded-full overflow-hidden bg-indigo-800">
+              <div className="h-36 w-36 rounded-full overflow-hidden  bg-gradient-to-r from-indigo-500 to-purple-500  text-black">
                 {userStats.avatar ? (
                   <img
                     src={userStats.avatar}
                     alt={userStats.name }
-                    className="h-full w-full object-cover"
+                    className="h-full w-full text-black object-cover"
                   />
                 ) : (
                   <div className="h-full w-full bg-indigo-600 flex items-center justify-center">
@@ -125,10 +130,10 @@ fetchTests()
               className="hidden"
             />
           </div>
-          <div>
+          <div> 
             <h1 className="text-2xl font-bold text-gray-900">{userStats.name}</h1>
-            <p className="text-gray-600">{userStats.email}</p>
-            <p className="text-sm text-gray-500">Member since {userStats.joinedDate}</p>
+            <p className="text-black">{userStats.email}</p>
+            <p className="text-sm text-black">Member since {userStats.joinedDate}</p>
           </div>
         </div>
       </div>
@@ -160,7 +165,7 @@ fetchTests()
          <ProgressBar
            icon={<BookOpen className="h-5 w-5" />}
            label="Questions Completed"
-           value={userStats.stats.completedQuestions && user.role=="user"}
+           value={userStats.stats.completedQuestions }
            total={200}
          />
            <ProgressBar

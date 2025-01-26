@@ -11,38 +11,37 @@ export const getTestById = async (id) => {
   return response.data.data;
 };
 
-export const startTest = async (id) => {
+export const startTest = async (id, userid) => {
   try {
-    console.log("dfs", id);
-    
     const token = localStorage.getItem('accessToken');
     console.log("Token sent to server:", token);
-    
+
     const response = await axios.post(
-      `${API_URL}/api/v1/tests/start/${id}`, 
-      {}, // Empty object for request body since no data needs to be sent
+      `${API_URL}/api/v1/tests/start/${id}`,
+      { userid }, // Pass userid as an object
       {
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       }
     );
-    
-    console.log(response.data);
-    return response.data.data;
-  } catch (error) {
-    console.error('Error fetching updateUserAvatar data:', error);
-  }
-}
 
-const token = localStorage.getItem("accessToken")
-export const submitTestAnswers = async (id, answers) => {
+    return response.data;
+  } catch (error) {
+    console.error("Error starting test:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+
+
+
+// const token = localStorage.getItem("accessToken")
+export const submitTestAnswers = async (id, answers,userid) => {
   try{
-  const response = await axios.post(`${API_URL}/api/v1/tests/submit/${id}`, { answers },
+  const response = await axios.post(`${API_URL}/api/v1/tests/submit/${id}`,{answers,userid},
     {
       headers: {
-        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       }
     }
