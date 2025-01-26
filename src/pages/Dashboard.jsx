@@ -139,8 +139,8 @@ const Dashboard = () => {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card title="Aptitude Questions" data={questions} link="/questions" />
-        <Card title="Available Mock Tests" data={mockTests} link="/mocktests" />
+        <Card title="Aptitude Questions" data={questions} link="user/questions" />
+        <Card title="Available Mock Tests" data={mockTests} link="user/mocktests" />
       </div>
     </div>
   );
