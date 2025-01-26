@@ -58,9 +58,9 @@ const AdminAuth = () => {
   };
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-gradient-to-r mt-10 from-blue-00 via-indigo-300 to-purple-300'>
-      <div className='p-8 w-[90%] md:w-[400px] bg-slate-500 shadow-lg rounded-3xl border-2 border-gray-200'>
-        <div className='text-center text-4xl font-semibold mb-8 text-gray-800'>
+    <div className='min-h-screen flex items-center justify-center  '>
+      <div className='p-8 w-[90%] md:w-[400px] bg-gray-800 shadow-lg rounded-3xl border-2'>
+        <div className='text-center text-4xl font-semibold mb-8 text-slate-200'>
           Admin Login
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6'>

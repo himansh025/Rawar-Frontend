@@ -63,7 +63,7 @@ console.log(response);
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-950 via-black to-gray-500">
             <div className="w-full max-w-md p-10 rounded-lg shadow-lg bg-gradient-to-b from-blue-600 to-black text-white">
                 <h1 className="text-3xl font-bold text-center mb-6 tracking-wide">
-                    Verify Emial Address
+                    Verify Email Address
                 </h1>
                 <p className="text-sm text-center text-gray-400 mb-8">
                     Enter the 4-digit OTP Sent to your registered email.

@@ -79,7 +79,7 @@ function Register() {
         <Button
           content={loading ? "Signing up..." : "Sign Up"}
           disabled={loading}
-          className={`w-full px-2 py-3 rounded-lg text-white ${
+          className={`mx-auto flex justify-center px-2 py-2 rounded-lg text-white ${
             loading
               ? "bg-gray-600 cursor-not-allowed"
               : "bg-indigo-600 hover:bg-indigo-700"

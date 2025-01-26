@@ -2,7 +2,16 @@ import axios from 'axios';
 const API_URL = import.meta.env.VITE_API_URL 
 
 export const getAllTests = async () => {
-  const response = await axios.get(`${API_URL}/ap1/v1/tests`);
+  try {
+    const response = await axios.get(`${API_URL}/api/v1/tests/alltests`)
+    console.log(response);  
+    return response.data
+  } catch (error) {
+    console.log(error);
+    
+  }
+  
+  
   return response.data.data;
 };
 
@@ -15,6 +24,7 @@ export const startTest = async (id, userid) => {
   try {
     const token = localStorage.getItem('accessToken');
     console.log("Token sent to server:", token);
+console.log(userid);
 
     const response = await axios.post(
       `${API_URL}/api/v1/tests/start/${id}`,

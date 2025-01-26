@@ -1,180 +1,119 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import { BookOpen, Users, GraduationCap, ClipboardList } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../store/authSlice';
-import { Aperture } from 'lucide-react';
-const API_URL = import.meta.env.VITE_API_URL 
+import { fetchalluser } from '../utils/userDataFetch.js';
+import { getAllTests } from '../utils/testDataFetch.js'
 
 const AdminDashboard = () => {
-    const [users, setUsers] = useState([""]);
-    const [faculties, setFaculties] = useState([""]);
-    const [mockTests, setMockTests] = useState([""]);
+    const [users, setUsers] = useState([]);
+    const [mockTests, setMockTests] = useState([]);
+    const [showAllUsers, setShowAllUsers] = useState(false);  // State for toggling user list visibility
+    const [showAllTests, setShowAllTests] = useState(false);  // State for toggling user list visibility
+
     const navigate = useNavigate();
-    // const user= useSelector((state)=>state)
+    const fetchData = async () => {
+        try {
+
+            const userResponse = await fetchalluser();
+            //   console.log("aya kya", userResponse);
+            const testResponse = await getAllTests();
+            //   console.log("aya kya", testResponse.data[0]);
+            setUsers(userResponse.data || []);
+            setMockTests(testResponse.data || []);
+        } catch (error) {
+            console.error('Error fetching data', error);
+        }
+    };
 
     useEffect(() => {
-  
-        const fetchData = async () => {
-            try {
-                const userResponse = await axios.get(`${API_URL}/api/v1/admin/users`);
-                const facultyResponse = await axios.get(`${API_URL}/api/v1/admin/faculties`);
-                const mockTestsResponse = await axios.get(`${API_URL}/api/v1/tests/alltests`);
-console.log("user",userResponse);
-
-                setUsers(userResponse?.data?.data?.length);
-                setFaculties(facultyResponse.data);
-                setMockTests(mockTestsResponse.data);
-            } catch (error) {
-                console.error('Error fetching data', error);
-            }
-        };
         fetchData();
     }, []);
 
-    const styles = {
-        container: {
-            fontFamily: 'Arial, sans-serif',
-            padding: '20px',
-            backgroundColor: '#f5f5f5',
-        },
-        header: {
-            textAlign: 'center',
-            color: '#333',
-            marginBottom: '20px',
-        },
-        adminCard: {
-            // display: 'flex',
-            // justifyContent: '',
-            alignItems: 'center',
-            background: '#fff',
-            padding: '20px',
-            marginBottom: '20px',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-            borderRadius: '8px',
-        },
-        button: {
-            padding: '10px 20px',
-            fontSize: '14px',
-            color: '#fff',
-            backgroundColor: '#007bff',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            transition: 'background-color 0.3s',
-        },
-        buttonHover: {
-            backgroundColor: '#0056b3',
-        },
-        dashboardColumns: {
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '20px',
-        },
-        section: {
-            background: '#fff',
-            padding: '20px',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-            borderRadius: '8px',
-        },
-        sectionHeader: {
-            fontSize: '16px',
-            color: '#333',
-            marginBottom: '10px',
-        },
-        list: {
-            listStyle: 'none',
-            padding: 0,
-            margin: 0,
-        },
-        listItem: {
-            padding: '8px 0',
-            borderBottom: '1px solid #ddd',
-        },
-        lastItem: {
-            borderBottom: 'none',
-        },
-    };
-
     return (
-       
-        <div style={styles.container}>
-            <h1 style={styles.header}>Admin Dashboard</h1>
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
+            <div className="max-w-7xl mx-auto space-y-8">
+                <header className="text-center">
+                    <h1 className="text-4xl font-bold text-white tracking-tight">Admin Dashboard</h1>
+                    <p className="mt-2 text-gray-400">Manage your platform's resources</p>
+                </header>
 
-            <div className='flex justify-around bg-blue-650' style={styles.adminCard}>
-               <div> <h2>Admin Actions</h2></div>
-               <div className=' flex gap-3'> <button
-                    style={styles.button}
-                    onMouseOver={(e) => (e.target.style.backgroundColor = '#0056b3')}
-                    onMouseOut={(e) => (e.target.style.backgroundColor = '#007bff')}
-                    onClick={() => navigate("/admin/work/mocktest")}
-                >
-                    Handle MockTest
-                </button>
-                <button
-                    style={styles.button}
-                    onMouseOver={(e) => (e.target.style.backgroundColor = '#0056b3')}
-                    onMouseOut={(e) => (e.target.style.backgroundColor = '#007bff')}
-                    onClick={() => navigate("/admin/work/question")}//not set routing
-                >
-                    Handle Apptitude Questions
-                </button>
+                <div className="bg-gray-800 rounded-2xl p-8 shadow-xl">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                        <h2 className="text-2xl font-semibold text-white">Quick Actions</h2>
+                        <div className="flex gap-4">
+                            <button
+                                onClick={() => navigate("/admin/work/mocktest")}
+                                className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200"
+                            >
+                                <ClipboardList className="h-5 w-5" />
+                                Handle MockTest
+                            </button>
+                            <button
+                                onClick={() => navigate("/admin/work/question")}
+                                className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200"
+                            >
+                                <BookOpen className="h-5 w-5" />
+                                Handle Aptitude Questions
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            {/* <div style={styles.adminCard}>
-                <h2>Admin Actions</h2>
-               
-            </div> */}
-            <div style={styles.dashboardColumns}>
-                <section style={styles.section}>
-                    <h2 style={styles.sectionHeader}> Total Users ({users || 0})</h2>
-                    <ul style={styles.list}>
-                        {users.users && users.users.map((user) => (
-                            <li style={styles.listItem} key={user.id}>
-                                {user.name} - {user.email}
-                            </li>
-                        ))}
-                    </ul>
-                </section>
-                <section style={styles.section}>
-                    <h2 style={styles.sectionHeader}>Faculties</h2>
-                    <ul style={styles.list}>
-                        {Array.isArray(faculties) &&
-                            faculties.map((faculty, index) => (
-                                <li
-                                    style={{
-                                        ...styles.listItem,
-                                        ...(index === faculties.length - 1
-                                            ? styles.lastItem
-                                            : {}),
-                                    }}
-                                    key={faculty.id}
-                                >
-                                    {faculty.name} - {faculty.department}
-                                </li>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="bg-gray-800 rounded-xl p-6 shadow-lg transform hover:scale-[1.02] transition-all duration-200">
+                        <div className="flex items-center gap-4 mb-6">
+                            <div className="p-3 bg-blue-600 rounded-lg">
+                                <Users className="h-6 w-6 text-white" />
+                            </div>
+                            <h2 className="text-xl font-semibold text-white">Total Users</h2>
+                        </div>
+                        <div className="text-3xl font-bold text-white mb-4">{users.length || 0}</div>
+
+                        {/* Show users in a list when button is clicked */}
+                        <div className="space-y-3">
+                            {showAllUsers && users.map((user) => (
+                                <div key={user.id} className="p-3 bg-gray-700 rounded-lg">
+                                    <p className="text-gray-200">{user.name}</p>
+                                    <p className="text-sm text-gray-400">{user.email}</p>
+                                </div>
                             ))}
-                    </ul>
-                </section>
-                <section style={styles.section}>
-                    <h2 style={styles.sectionHeader}>Mock Tests</h2>
-                    <ul style={styles.list}>
-                        {Array.isArray(mockTests) &&
-                            mockTests.map((test, index) => (
-                                <li
-                                    style={{
-                                        ...styles.listItem,
-                                        ...(index === mockTests.length - 1
-                                            ? styles.lastItem
-                                            : {}),
-                                    }}
-                                    key={test.id}
-                                >
-                                    {test.title} - {test.date}
-                                </li>
+                        </div>
+
+                        {/* Button to toggle the visibility of the full users list */}
+
+                        <button
+                            onClick={() => setShowAllUsers(!showAllUsers)}
+                            className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 focus:outline-none"
+                        >
+                            {showAllUsers ? 'Hide Users' : 'Show All Users'}
+                        </button>
+                    </div>
+                    <div className="bg-gray-800 rounded-xl p-6 shadow-lg transform hover:scale-[1.02] transition-all duration-200">
+                        <div className="flex items-center gap-4 mb-6">
+                            <div className="p-3 bg-purple-600 rounded-lg">
+                                <ClipboardList className="h-6 w-6 text-white" />
+                            </div>
+                            <h2 className="text-xl font-semibold text-white">Mock Tests</h2>
+                        </div>
+                        <div className="space-y-3">
+                            {mockTests.map((test) => (
+                                <div key={test.id} className="p-3 bg-gray-700 rounded-lg">
+                                    <p className="text-gray-200">{test.title}</p>
+                                    <p className="text-sm text-gray-400">{test.category}</p>
+                                </div>
                             ))}
-                    </ul>
-                </section>
+                        </div>
+                        {mockTests.length > 2 ? (
+                            <button
+                                onClick={() => setShowAllTests(!showAllTests)}
+                                className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 focus:outline-none"
+                            >
+                                {showAllTests ? 'Hide test' : 'Show All test'}
+                            </button>
+                        ) : null}
+
+                    </div>
+                </div>
             </div>
         </div>
     );

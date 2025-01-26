@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Brain, Target, CheckCircle, XCircle } from 'lucide-react';
+import { Clock, Brain, Target, CheckCircle, XCircle, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useTimer } from '../utils/hooks';
 import { formatTime } from '../utils/formatTime';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-import { startTest,submitTestAnswers } from '../utils/testDataFetch.js';
+import { startTest, submitTestAnswers } from '../utils/testDataFetch.js';
 import { useNavigate } from 'react-router-dom';
-// import 'react-toastify/dist/ReactToastify.css';
+
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function MockTests() {
@@ -18,10 +18,7 @@ function MockTests() {
   const [userAnswers, setUserAnswers] = useState({});
   const [testResults, setTestResults] = useState(null);
   const user = useSelector((state) => state.auth.user) || false;
-  let userid= user._id
-  // console.log(userid);
-  const navigate= useNavigate()
-  
+  const navigate = useNavigate();
 
   const { time, startTimer, pauseTimer } = useTimer(activeTest?.duration || 3600);
 
@@ -32,8 +29,6 @@ function MockTests() {
   const fetchTests = async () => {
     try {
       const response = await axios.get(`${apiUrl}/api/v1/tests/alltests`);
-      console.log("kya aya",response);
-      
       setTests(response.data.data);
       setLoading(false);
     } catch (err) {
@@ -42,40 +37,37 @@ function MockTests() {
     }
   };
 
-    const handleStartTest = async (test) => {
-      if(user){
-   
-        console.log("test",test);
-          // Check if the test has already been taken
-          console.log("user",user);
-
-          const isTestTaken = user?.testSessions.some(session => session.testId === test._id);
-          // console.log("is test laken",isTestTaken);  
-          if (isTestTaken) {
-            alert("You have already started this test. You cannot start it again.");
-            return;
-          }
-         
-      const response= await startTest(test._id,user._id)
-   console.log(response);
-        setActiveTest(test);
-        setCurrentQuestionIndex(0);
-        setUserAnswers({});
-        setTestResults(null);
-        startTimer();
-      
+  const handleStartTest = async (test) => {
+    if (!user) {
+      alert("Please login");
+      navigate('/user/login');
+      return;
     }
-    else{
-      alert("please login")
-      navigate('/login')
-      return
-    }}
+console.log(user);
 
+    const isTestTaken = user?.testSessions?.some(session => session.testId === test._id);
+    if (isTestTaken) {
+      alert("You have already started this test. You cannot start it again.");
+      return;
+    }
 
-  const handleAnswerSelect = (questionId, answer,) => {
-    console.log("question ans",questionId,answer);
-    
-    setUserAnswers((prev) => ({
+    try {
+      console.log(user.createdUser._id);
+      
+      await startTest(test._id, user.createdUser._id);
+      setActiveTest(test);
+      setCurrentQuestionIndex(0);
+      setUserAnswers({});
+      setTestResults(null);
+      startTimer();
+    } catch (error) {
+      console.error('Error starting test:', error);
+      alert('Failed to start test. Please try again.');
+    }
+  };
+
+  const handleAnswerSelect = (questionId, answer) => {
+    setUserAnswers(prev => ({
       ...prev,
       [questionId]: answer
     }));
@@ -83,288 +75,254 @@ function MockTests() {
 
   const handleNextQuestion = () => {
     if (currentQuestionIndex < activeTest.questions.length - 1) {
-      setCurrentQuestionIndex((prev) => prev + 1);
+      setCurrentQuestionIndex(prev => prev + 1);
     }
   };
 
   const handlePrevQuestion = () => {
     if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex((prev) => prev - 1);
+      setCurrentQuestionIndex(prev => prev - 1);
     }
   };
 
   const handleSubmitTest = async () => {
     try {
       pauseTimer();
-      console.log(userAnswers);
-  
       const answers = Object.values(userAnswers);
-      console.log("User ID:", userid);
-      console.log("Active Test ID:", activeTest._id);
-  
-      const response = await submitTestAnswers(activeTest._id, answers, userid);
+      const response = await submitTestAnswers(activeTest._id, answers, user.createdUser._id);
       setTestResults(response.data.data);
     } catch (err) {
       console.error('Error submitting test:', err);
-      setError('Failed to submit test. Please try again.');
+      alert('Failed to submit test. Please try again.');
     }
   };
-  
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading tests...</div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-red-600">{error}</div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="bg-red-50 text-red-800 rounded-lg p-4 shadow-lg">
+          {error}
+        </div>
       </div>
     );
   }
 
   if (activeTest && !testResults) {
     return (
-      <TestInProgress
-        test={activeTest}
-        currentQuestionIndex={currentQuestionIndex}
-        totalQuestions={activeTest.questions.length}
-        timeRemaining={time}
-        userAnswers={userAnswers}
-        onAnswerSelect={handleAnswerSelect}
-        onNext={handleNextQuestion}
-        onPrev={handlePrevQuestion}
-        onSubmit={handleSubmitTest}
-      />
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-gray-800 rounded-xl shadow-xl overflow-hidden">
+            <div className="p-6 border-b border-gray-700">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-4">
+                  <span className="text-lg font-medium text-white">
+                    Question {currentQuestionIndex + 1} of {activeTest.questions.length}
+                  </span>
+                  <div className="h-2 w-48 bg-gray-700 rounded-full">
+                    <div
+                      className="h-2 bg-indigo-500 rounded-full transition-all duration-300"
+                      style={{ width: `${((currentQuestionIndex + 1) / activeTest.questions.length) * 100}%` }}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center text-white">
+                  <Clock className="h-5 w-5 mr-2" />
+                  <span className="font-medium">{formatTime(time)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <h2 className="text-xl font-semibold text-white mb-6">
+                {activeTest.questions[currentQuestionIndex].question}
+              </h2>
+              
+              <div className="space-y-4">
+                {activeTest.questions[currentQuestionIndex].options.map((option, index) => (
+                  <label
+                    key={index}
+                    className={`block p-4 rounded-lg cursor-pointer transition-all duration-200 ${
+                      userAnswers[activeTest.questions[currentQuestionIndex]._id] === option
+                        ? 'bg-indigo-900 border-2 border-indigo-500'
+                        : 'bg-gray-700 border-2 border-transparent hover:border-gray-600'
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      <input
+                        type="radio"
+                        name="answer"
+                        value={option}
+                        checked={userAnswers[activeTest.questions[currentQuestionIndex]._id] === option}
+                        onChange={() => handleAnswerSelect(activeTest.questions[currentQuestionIndex]._id, option)}
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <span className="ml-3 text-white">{option}</span>
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              <div className="flex justify-between mt-8">
+                <button
+                  onClick={handlePrevQuestion}
+                  disabled={currentQuestionIndex === 0}
+                  className="flex items-center px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                >
+                  <ArrowLeft className="h-5 w-5 mr-2" />
+                  Previous
+                </button>
+                
+                {currentQuestionIndex === activeTest.questions.length - 1 ? (
+                  <button
+                    onClick={handleSubmitTest}
+                    className="flex items-center px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500 transition-colors duration-200"
+                  >
+                    Submit Test
+                    <CheckCircle className="h-5 w-5 ml-2" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleNextQuestion}
+                    className="flex items-center px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors duration-200"
+                  >
+                    Next
+                    <ArrowRight className="h-5 w-5 ml-2" />
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
   if (testResults) {
     return (
-      <TestResults
-        results={testResults}
-        test={activeTest}
-        onBackToTests={() => {
-          setActiveTest(null);
-          setTestResults(null);
-        }}
-      />
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-gray-800 rounded-xl shadow-xl overflow-hidden">
+            <div className="p-8">
+              <h2 className="text-3xl font-bold text-white mb-8">Test Results</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="bg-gray-700 rounded-xl p-6">
+                  <div className="flex items-center">
+                    <CheckCircle className="h-8 w-8 text-green-400" />
+                    <div className="ml-3">
+                      <p className="text-sm font-medium text-gray-300">Correct Answers</p>
+                      <p className="text-2xl font-semibold text-green-400">{testResults.correct}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-700 rounded-xl p-6">
+                  <div className="flex items-center">
+                    <XCircle className="h-8 w-8 text-red-400" />
+                    <div className="ml-3">
+                      <p className="text-sm font-medium text-gray-300">Incorrect Answers</p>
+                      <p className="text-2xl font-semibold text-red-400">{testResults.incorrect}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-700 rounded-xl p-6">
+                  <div className="flex items-center">
+                    <Target className="h-8 w-8 text-blue-400" />
+                    <div className="ml-3">
+                      <p className="text-sm font-medium text-gray-300">Accuracy</p>
+                      <p className="text-2xl font-semibold text-blue-400">{testResults.accuracy}%</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-gray-700 pt-6">
+                <h3 className="text-xl font-semibold text-white mb-6">Performance Summary</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between text-gray-300">
+                    <span>Total Questions</span>
+                    <span className="font-medium">{testResults.totalQuestions}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-gray-300">
+                    <span>Time Taken</span>
+                    <span className="font-medium">{formatTime(activeTest.duration)}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-300">Final Score</span>
+                    <span className="font-medium text-lg text-indigo-400">{testResults.score} points</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8">
+                <button
+                  onClick={() => {
+                    setActiveTest(null);
+                    setTestResults(null);
+                  }}
+                  className="w-full flex justify-center items-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors duration-200"
+                >
+                  Back to Tests
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-900">Mock Tests</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tests.map((test) => (
-          <TestCard
-            key={test._id}
-            test={test}
-            onStart={() => handleStartTest(test)}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function TestCard({ test, onStart }) {
-  return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h3 className="text-xl font-semibold text-gray-900 mb-2">{test.title}</h3>
-      <p className="text-gray-600 mb-4">{test.description}</p>
-      
-      <div className="space-y-2 mb-4">
-        <div className="flex items-center text-sm text-gray-500">
-          <Clock className="h-4 w-4 mr-2" />
-          <span>{formatTime(test.duration)}</span>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col items-center mb-12">
+          <h1 className="text-4xl font-bold text-white tracking-tight mb-4">Mock Tests</h1>
+          <p className="text-gray-400 text-center max-w-2xl">
+            Practice with our comprehensive mock tests to improve your skills and track your progress
+          </p>
         </div>
-        <div className="flex items-center text-sm text-gray-500">
-          <Brain className="h-4 w-4 mr-2" />
-          <span>{test.questions.length} Questions</span>
-        </div>
-        <div className="flex items-center text-sm text-gray-500">
-          <Target className="h-4 w-4 mr-2" />
-          <span className="capitalize">{test.difficulty} Difficulty</span>
-        </div>
-      </div>
-      
-      <button
-        onClick={onStart}
-        className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-      >
-        Start Test
-      </button>
-    </div>
-  );
-}
-
-function TestInProgress({
-  test,
-  currentQuestionIndex,
-  totalQuestions,
-  timeRemaining,
-  userAnswers,
-  onAnswerSelect,
-  onNext,
-  onPrev,
-  onSubmit
-}) {
-  const currentQuestion = test.questions[currentQuestionIndex];
-
-  return (
-    <div className="space-y-6">
-      <div className="bg-white shadow-md rounded-lg p-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <span className="text-lg font-medium">
-              Question {currentQuestionIndex + 1} of {totalQuestions}
-            </span>
-            <div className="h-2 w-48 bg-gray-200 rounded-full">
-              <div
-                className="h-2 bg-indigo-600 rounded-full"
-                style={{ width: `${((currentQuestionIndex + 1) / totalQuestions) * 100}%` }}
-              />
-            </div>
-          </div>
-          <div className="flex items-center text-gray-700">
-            <Clock className="h-5 w-5 mr-2" />
-            <span className="font-medium">{formatTime(timeRemaining)}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-xl font-semibold mb-4">{currentQuestion.question}</h2>
         
-        <div className="space-y-3">
-          {currentQuestion.options.map((option, index) => (
-            <label
-              key={index}
-              className={`block p-4 border rounded-lg cursor-pointer transition-colors
-                ${userAnswers[currentQuestion._id] === option
-                  ? 'bg-indigo-50 border-indigo-500'
-                  : 'hover:bg-gray-50 border-gray-200'
-                }
-              `}>
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  name="answer"
-                  value={option}
-                  checked={userAnswers[currentQuestion._id] === option}
-                  onChange={() => onAnswerSelect(currentQuestion._id, option)}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
-                />
-                <span className="ml-3">{option}</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {tests.map((test) => (
+            <div
+              key={test._id}
+              className="bg-gray-800 rounded-xl p-6 shadow-xl hover:transform hover:scale-[1.02] transition-all duration-200"
+            >
+              <h3 className="text-xl font-semibold text-white mb-3">{test.title}</h3>
+              <p className="text-gray-400 h-24 mb-6">{test.description}</p>
+              
+              <div className="space-y-3 mb-6">
+                <div className="flex items-center text-gray-300">
+                  <Clock className="h-5 w-5 mr-3 text-indigo-400" />
+                  <span>{formatTime(test.duration)}</span>
+                </div>
+                <div className="flex items-center text-gray-300">
+                  <Brain className="h-5 w-5 mr-3 text-indigo-400" />
+                  <span>{test.questions.length} Questions</span>
+                </div>
+                <div className="flex items-center text-gray-300">
+                  <Target className="h-5 w-5 mr-3 text-indigo-400" />
+                  <span className="capitalize">{test.difficulty} Difficulty</span>
+                </div>
               </div>
-            </label>
+              
+              <button
+                onClick={() => handleStartTest(test)}
+                className="w-full flex justify-center items-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors duration-200"
+              >
+                Start Test
+              </button>
+            </div>
           ))}
-        </div>
-
-        <div className="flex justify-between mt-6">
-          <button
-            onClick={onPrev}
-            disabled={currentQuestionIndex === 0}
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-          >
-            Previous
-          </button>
-          
-          {currentQuestionIndex === totalQuestions - 1 ? (
-            <button
-              onClick={onSubmit}
-              className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-            >
-              Submit Test
-            </button>
-          ) : (
-            <button
-              onClick={onNext}
-              className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Next
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function TestResults({ results, test, onBackToTests }) {
-  return (
-    <div className="space-y-6">
-      <div className="bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Test Results</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="bg-green-50 p-4 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <CheckCircle className="h-8 w-8 text-green-400" />
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-green-800">Correct Answers</p>
-                  <p className="text-2xl font-semibold text-green-900">{results.correct}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-red-50 p-4 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <XCircle className="h-8 w-8 text-red-400" />
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-red-800">Incorrect Answers</p>
-                  <p className="text-2xl font-semibold text-red-900">{results.incorrect}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <Target className="h-8 w-8 text-blue-400" />
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-blue-800">Accuracy</p>
-                  <p className="text-2xl font-semibold text-blue-900">{results.accuracy}%</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t pt-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Summary</h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-600">Total Questions</span>
-              <span className="font-medium">{results.totalQuestions}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-600">Time Taken</span>
-              <span className="font-medium">{formatTime(test.duration)}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-600">Final Score</span>
-              <span className="font-medium text-lg text-indigo-600">{results.score} points</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6">
-          <button
-            onClick={onBackToTests}
-            className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Back to Tests
-          </button>
         </div>
       </div>
     </div>

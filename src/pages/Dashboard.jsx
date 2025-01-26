@@ -52,14 +52,14 @@ const Dashboard = () => {
       value: progressData?.progress?.completedQuestions || 0,
       total: 200,
       icon: BookOpen,
-      color: "bg-blue-500 text-white",
+      color: "bg-gradient-to-br from-blue-500 to-blue-600",
     },
     {
       label: "Tests Taken",
       value: progressData?.progress?.testsTaken || 0,
       total: 20,
       icon: Clock,
-      color: "bg-purple-500 text-white",
+      color: "bg-gradient-to-br from-purple-500 to-purple-600",
     },
     {
       label: "Success Rate",
@@ -68,89 +68,99 @@ const Dashboard = () => {
         progressData?.progress?.correctAnswers
       ),
       icon: Brain,
-      color: "bg-green-500 text-white",
+      color: "bg-gradient-to-br from-green-500 to-green-600",
     },
     {
       label: "Current Rank",
       value: `#${user?.stats?.rank || 0}`,
       icon: Award,
-      color: "bg-orange-500 text-white",
+      color: "bg-gradient-to-br from-orange-500 to-orange-600",
     },
   ];
 
-
-
   return (
-    <div  className="max-w-7xl mx-auto bg-gray-200  px-4 sm:px-6 lg:px-8 py-8">
-      <header className="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg shadow-md p-6 mb-8 text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">
-              {user ? `Welcome back, ${progressData.name}!` : "Welcome to the Learning Platform!"}
-            </h1>
-            <p className="mt-1 text-sm">
-              {user
-                ? "Track your progress and continue your learning journey"
-                : "Sign in to track your progress and start learning"}
-            </p>
-          </div>
-          {user && (
-            <div className="h-28 w-28 rounded-full overflow-hidden bg-white shadow-lg">
-              {progressData.avatar ? (
-                <img src={progressData.avatar} alt={progressData.name} className="h-full w-full object-cover" />
-              ) : (
-                <User className="h-8 w-8 text-indigo-600" />
-              )}
+    <div className="min-h-screen ">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <header className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-xl p-8 mb-10 text-white transform hover:scale-[1.02] transition-transform duration-300">
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <h1 className="text-3xl font-bold tracking-tight">
+                {user ? `Welcome back, ${progressData.name}!` : "Welcome to the Learning Platform!"}
+              </h1>
+              <p className="text-indigo-100">
+                {user
+                  ? "Track your progress and continue your learning journey"
+                  : "Sign in to track your progress and start learning"}
+              </p>
             </div>
-          )}
-        </div>
-      </header>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat) => (
-          <StatesCard
-            key={stat.label}
-            icon={<stat.icon className="h-6 w-6" />}
-            title={stat.label}
-            value={stat.value}
-            className={`p-4 rounded-lg shadow-lg ${stat.color}`}
-          />
-        ))}
-      </div>
-
-      {user && (
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-lg font-semibold mb-4">Your Progress</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <ProgressBar
-              icon={<BookOpen className="h-5 w-5" />}
-              label="Questions Completed"
-              value={user.progress?.completedQuestions || 0}
-              total={200}
-            />
-            <ProgressBar
-              icon={<Check className="h-5 w-5" />}
-              label="Correct Answers"
-              value={user.progress?.correctAnswers || 0}
-              total={200}
-            />
+            {user && (
+             <div className="h-24 w-24 md:h-32 md:w-32 rounded-full overflow-hidden bg-white shadow-2xl ring-4 ring-indigo-400 ring-opacity-50">
+             {progressData.avatar ? (
+               <img
+                 src={progressData.avatar}
+                 alt={progressData.name}
+                 className="h-full  w-full object-cover"
+               />
+             ) : (
+               <div className="h-full w-full flex items-center justify-center bg-indigo-100">
+                 <User className="h-10 w-10 md:h-12 md:w-12 text-indigo-600" />
+               </div>
+             )}
+           </div>
+           
+            )}
           </div>
-        </div>
-      )}
+        </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card title="Aptitude Questions" data={questions} link="user/questions" />
-        <Card title="Available Mock Tests" data={mockTests} link="user/mocktests" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          {stats.map((stat) => (
+            <StatesCard
+              key={stat.label}
+              icon={<stat.icon className="h-7 w-7" />}
+              title={stat.label}
+              value={stat.value}
+              className={`p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 ${stat.color}`}
+            />
+          ))}
+        </div>
+
+        {user && (
+          <div className="bg-white rounded-xl shadow-lg p-8 mb-10 transform hover:shadow-xl transition-shadow duration-300">
+            <h2 className="text-xl font-bold mb-6 text-gray-800">Your Progress</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <ProgressBar
+                icon={<BookOpen className="h-6 w-6" />}
+                label="Questions Completed"
+                value={user.progress?.completedQuestions || 0}
+                total={200}
+              />
+              <ProgressBar
+                icon={<Check className="h-6 w-6" />}
+                label="Correct Answers"
+                value={user.progress?.correctAnswers || 0}
+                total={200}
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <Card title="Aptitude Questions" data={questions} link="user/questions" />
+          <Card title="Available Mock Tests" data={mockTests} link="user/mocktests" />
+        </div>
       </div>
     </div>
   );
 };
 
 const Card = ({ title, data, link }) => (
-  <div className="bg-white shadow-lg rounded-xl p-6">
-    <div className="flex items-center justify-between mb-6">
-      <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
-      <Link to={link} className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+  <div className="bg-white shadow-lg rounded-xl p-8 transform hover:shadow-xl transition-all duration-300">
+    <div className="flex items-center justify-between mb-8">
+      <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+      <Link 
+        to={link} 
+        className="px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-500 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors duration-300"
+      >
         View all
       </Link>
     </div>
@@ -158,12 +168,12 @@ const Card = ({ title, data, link }) => (
       {data.slice(0, 3).map((item) => (
         <div
           key={item._id}
-          className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+          className="p-6 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all duration-300 transform hover:scale-[1.02]"
         >
-          <h3 className="text-sm font-medium text-gray-900">{item.title || item.question}</h3>
-          <div className="flex items-center gap-4 mt-2">
+          <h3 className="text-base font-semibold text-gray-900">{item.title || item.question}</h3>
+          <div className="flex items-center gap-4 mt-3">
             <span
-              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                 item.difficulty === "easy"
                   ? "bg-green-100 text-green-800"
                   : item.difficulty === "medium"

@@ -104,8 +104,9 @@ console.log(user.role);
         className={`md:hidden ${isMobileMenuOpen ? "block" : "hidden"} bg-gray-100 rounded-lg shadow-md p-4 space-y-4`}
       >
         <MobileNavLink to="/" text="Home" onClick={toggleMobileMenu} />
-        <MobileNavLink to="/questions" text="Questions" onClick={toggleMobileMenu} />
-        <MobileNavLink to="/mocktests" text="Mock Tests" onClick={toggleMobileMenu} />
+        <MobileNavLink to="user/questions" text="Questions" onClick={toggleMobileMenu} />
+        <MobileNavLink to="user/mocktests" text="Mock Tests" onClick={toggleMobileMenu} />
+        <MobileNavLink to="user/userprofile" text="Profile" onClick={toggleMobileMenu} />
         {/* <MobileNavLink to="/leaderboard" text="Leaderboard" onClick={toggleMobileMenu} /> */}
         {!user ? (
           <div className="space-y-2">

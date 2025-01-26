@@ -17,6 +17,7 @@ const registerUser = async (formData) => {
   }
 };
 
+
 const loginUser = async (formData) => {
   try {
     console.log("Login form data:", formData);
@@ -70,27 +71,27 @@ const adminlogin = async (formData) => {
   }
 };
 
-const callchatbot = async (data) => {
-  console.log(data);
-  const {prompt} = data;
+// const callchatbot = async (data) => {
+//   console.log(data);
+//   const {prompt} = data;
   
-  try {
-    const token = localStorage.getItem('accessToken');
-    // console.log(document.cookie.includes('accessToken'))
-    // console.log(token)
-    // console.log(formData)
-    const response = await axios.post(`${apiUrl}/api/v1/user/chatbot`, {prompt},
-       {
-         headers:{
-             Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json"
-    } });
-    // console.log(response.data);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching logout data:', error);
-  }
-}
+//   try {
+//     const token = localStorage.getItem('accessToken');
+//     // console.log(document.cookie.includes('accessToken'))
+//     // console.log(token)
+//     // console.log(formData)
+//     const response = await axios.post(`${apiUrl}/api/v1/user/chatbot`, {prompt},
+//        {
+//          headers:{
+//              Authorization: `Bearer ${token}`,
+//       "Content-Type": "application/json"
+//     } });
+//     // console.log(response.data);
+//     return response.data;
+//   } catch (error) {
+//     console.error('Error fetching logout data:', error);
+//   }
+// }
 
 const logoutUser = async () => {
   try {
@@ -160,6 +161,20 @@ const getCurrentUser = async () => {
 }
 };
 
+const fetchalluser = async () => {
+  try {
+    // Make the API request with authorization header
+    const response = await axios.get(`${apiUrl}/api/v1/admin/users`);
+  console.log('all user data:', response.data);
+  return response.data;
+} catch (error) {
+  // Improved error handling
+  console.error('Error fetching current user data:', error.response?.data || error.message);
+  // throw error; // Optional: rethrow the error if you need to handle it elsewhere
+}
+};
+
+
 const  getUserProfileStats= async () => {
   try {
     const token = localStorage.getItem('accessToken');
@@ -201,6 +216,7 @@ export {
   getUserProfileStats,
   refreshAccessToken,
   verifyOtp,
-  callchatbot,
-  adminlogin
+  // callchatbot,
+  adminlogin,
+  fetchalluser
 }
