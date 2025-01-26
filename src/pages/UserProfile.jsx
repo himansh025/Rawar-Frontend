@@ -79,8 +79,7 @@ const [totaltestconduct,settotaltestconduct]= useState(0)
               ),
               completedQuestions: data.progress.completedQuestions|| 0,
               correctAnswers: data.progress.correctAnswers|| 0,
-              testsTaken: data.progress.testsTaken || 0,
-              rank: 42            },
+              testsTaken: data.progress.testsTaken || 0          },
           });
 // console.log(userStats.avatar);
         } else {
