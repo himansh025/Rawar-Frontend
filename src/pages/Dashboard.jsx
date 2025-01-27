@@ -149,9 +149,11 @@ const Dashboard = () => {
           <Card title="Available Mock Tests" data={mockTests} link="user/mocktests" />
         </div>
       </div>
+     
     </div>
   );
 };
+
 
 const Card = ({ title, data, link }) => (
   <div className="bg-white shadow-lg rounded-xl p-8 transform hover:shadow-xl transition-all duration-300">

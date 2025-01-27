@@ -39,6 +39,7 @@ console.log(user.role);
             ): <  NavLink to="/" icon={<Layout className="h-5 w-5" />} text="Dashboard" />}
          
             <NavLink to="/user/questions" icon={<BookOpen className="h-5 w-5" />} text="Questions" />
+            {/* <NavLink to="/user/chatbot" icon={<BookOpen className="h-5 w-5" />} text="chatbot" /> */}
             <NavLink to="/user/mocktests" icon={<TestTube2 className="h-5 w-5" />} text="Mock Tests" />
             {/* <NavLink to="/leaderboard" icon={<Trophy className="h-5 w-5" />} text="Leaderboard" /> */}
           </div>

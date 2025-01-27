@@ -1,5 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import QuestionBank from './pages/QuestionBank';
@@ -13,23 +14,61 @@ import { Logout } from './components/auth/Logout';
 import Register from './components/auth/Register';
 import AdminDashboard from './pages/AdminDashboard';
 import TestManagement from './components/TestManagement';
-import { Outlet } from 'react-router-dom';
+import Chatbot from './components/Chatbot';
 
-// Parent Component for Admin Routes
-function AdminLayout() {
+function FloatingChatbot() {
+  const user = useSelector((state) => state.auth.user);
+
   return (
-    <>
-    <Outlet />
-</>
+    user && (
+      <div className="fixed bottom-4 right-4 z-50">
+        <button
+          className="w-12 h-12 bg-blue-500 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-600"
+          onClick={() => {
+            const chatbotElement = document.getElementById('chatbot-container');
+            if (chatbotElement) {
+              chatbotElement.classList.toggle('hidden');
+            }
+          }}
+        >
+          💬
+        </button>
+        <div
+          id="chatbot-container"
+          className="hidden fixed bottom-20 right-4 w-80 h-96 bg-white rounded-lg shadow-lg overflow-hidden"
+        >
+          <Chatbot />
+        </div>
+      </div>
+    )
   );
 }
 
-// Parent Component for User Routes
+function AdminLayout() {
+  return (
+    <>
+      <FloatingChatbot />
+      <Outlet />
+    </>
+  );
+}
+
 function UserLayout() {
   return (
-<>
+    <>
+      <FloatingChatbot />
       <Outlet />
-</>
+    </>
+  );
+}
+
+// Updated Dashboard with Floating Chatbot
+function EnhancedDashboard() {
+  return (
+    <div>
+      <FloatingChatbot />
+      <Dashboard />
+    </div>
   );
 }
 
@@ -41,14 +80,15 @@ function App() {
         <main className="container mt-16 px-4 py-8">
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<EnhancedDashboard />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Register />} />
-            <Route path="/verifyotp" element={<Verifyotp />} /><Route path="/adminlogin" element={<AdminAuth />} />
+            <Route path="/verifyotp" element={<Verifyotp />} />
+            <Route path="/adminlogin" element={<AdminAuth />} />
 
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<AdminDashboard />} /> 
+              <Route index element={<AdminDashboard />} />
               <Route path="adminauth" element={<AdminAuth />} />
               <Route path="admindashboard" element={<AdminDashboard />} />
               <Route path="work/:type" element={<TestManagement />} />
@@ -61,6 +101,7 @@ function App() {
               <Route path="questions" element={<QuestionBank />} />
               <Route path="questionsolver" element={<QuestionSolver />} />
               <Route path="mocktests" element={<MockTests />} />
+              <Route path="chatbot" element={<Chatbot />} />
             </Route>
 
             {/* Logout Route */}

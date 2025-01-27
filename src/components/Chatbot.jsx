@@ -1,254 +1,159 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, UserPlus, X } from 'lucide-react';
-import {callchatbot} from '../utils/userDataFetch.js'
-const Chatbot = () => {
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [showRegistration, setShowRegistration] = useState(false);
-  const [registrationData, setRegistrationData] = useState({
-    name: '',
-    email: '',
-    password: '',
-  });
-  const [avatarPreview, setAvatarPreview] = useState('');
-  const [error, setError] = useState('');
-  const messagesEndRef = useRef(null);
-  const fileInputRef = useRef(null);
+import { useState, useRef, useEffect } from "react";
+// import "./App.css";
+import axios from "axios";
+import ReactMarkdown from "react-markdown";
+// import Navbar from "./Navbar";
+const CHAT_BOT_KEY = import.meta.env.VITE_CHAT_BOT_KEY;
+import Navbar from "../components/Navbar";
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+
+function Chatbot() {
+  const [chatHistory, setChatHistory] = useState([]);
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [generatingAnswer, setGeneratingAnswer] = useState(false);
+
+  const chatContainerRef = useRef(null);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const handleSend = async (e) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    const newMessage = {
-      content: input,
-      isUser: true,
-      timestamp: new Date(),
-    };
-
-    setMessages(prev => [...prev, newMessage]);
-    setInput('');
-    setIsLoading(true);
-
-    try {
-      const response = await callchatbot({prompt:input})
-
-
-      const data = await response.json();
-      
-      if (response.ok) {
-        setMessages(prev => [...prev, {
-          content: data.data,
-          isUser: false,
-          timestamp: new Date(),
-        }]);
-      } else {
-        throw new Error(data.message || 'Failed to get response');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      setMessages(prev => [...prev, {
-        content: 'Sorry, I encountered an error. Please try again.',
-        isUser: false,
-        timestamp: new Date(),
-      }]);
-    } finally {
-      setIsLoading(false);
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
-  };
+  }, [chatHistory, generatingAnswer]);
 
-  const handleRegistrationChange = (e) => {
-    const { name, value } = e.target;
-    setRegistrationData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    setError('');
-  };
-
-//   const handleAvatarChange = (e) => {
-//     const file = e.target.files[0];
-//     if (file) {
-//       if (file.size > 5 * 1024 * 1024) {
-//         setError('File size should be less than 5MB');
-//         return;
-//       }
-      
-//       const reader = new FileReader();
-//       reader.onloadend = () => {
-//         setAvatarPreview(reader.result);
-//       };
-//       reader.readAsDataURL(file);
-      
-//       setRegistrationData(prev => ({
-//         ...prev,
-//         avatar: file
-//       }));
-//     }
-//   };
-
-  const handleRegistration = async (e) => {
+  async function generateAnswer(e) {
     e.preventDefault();
-    setIsLoading(true);
-    setError('');
-
-    const formData = new FormData();
-    Object.entries(registrationData).forEach(([key, value]) => {
-      if (value) formData.append(key, value);
-    });
-
-    try {
-      const response = Chatbot(formData)
-
+    if (!question.trim()) return;
     
-      
-      if (response.ok) {
-        setShowRegistration(false);
-        setMessages(prev => [...prev, {
-          content: 'Registration successful! You can now start chatting.',
-          isUser: false,
-          timestamp: new Date(),
-        }]);
-      } else {
-        throw new Error(data.message || 'Registration failed');
-      }
+    setGeneratingAnswer(true);
+    const currentQuestion = question;
+    setQuestion(""); // Clear input immediately after sending
+    
+    // Add user question to chat history
+    setChatHistory(prev => [...prev, { type: 'question', content: currentQuestion }]);
+    
+    
+    try {
+      const response = await axios({
+        url: CHAT_BOT_KEY,
+        method: "post",
+        data: {
+          contents: [{ parts: [{ text: question }] }],
+        },
+      });      
+
+      const aiResponse = response["data"]["candidates"][0]["content"]["parts"][0]["text"];
+      setChatHistory(prev => [...prev, { type: 'answer', content: aiResponse }]);
+      setAnswer(aiResponse);
     } catch (error) {
-      console.error('Error:', error);
-      setError(error.message || 'Registration failed. Please try again.');
-    } finally {
-      setIsLoading(false);
+      console.log(error);
+      setAnswer("Sorry - Something went wrong. Please try again!");
     }
-  };
+    setGeneratingAnswer(false);
+  }
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto p-4">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-gray-800">Interactive Storytelling Chat</h1>
-          <button
-            onClick={() => setShowRegistration(prev => !prev)}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-          >
-            {showRegistration ? <X className="h-5 w-5" /> : <UserPlus className="h-5 w-5" />}
-            {showRegistration ? 'Close' : 'Register'}
-          </button>
-        </div>
 
-        {showRegistration ? (
-          <div className="bg-white p-6 rounded-lg shadow-md mb-4">
-            <h2 className="text-xl font-semibold mb-4">Register</h2>
-            {error && <p className="text-red-500 mb-4">{error}</p>}
-            <form onSubmit={handleRegistration} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Full Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={registrationData.fullname}
-                  onChange={handleRegistrationChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={registrationData.email}
-                  onChange={handleRegistrationChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  required
-                />
-              </div>
-           
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={registrationData.password}
-                  onChange={handleRegistrationChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  required
-                />
-              </div>
-              
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-              >
-                {isLoading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  'Register'
-                )}
-              </button>
-            </form>
-          </div>
-        ) : (
-          <>
-            <div className="flex-1 bg-white rounded-lg shadow-md p-4 mb-4 overflow-y-auto">
-              <div className="space-y-4">
-                {messages.map((message, index) => (
-                  <div
-                    key={index}
-                    className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-[80%] rounded-lg p-3 ${
-                        message.isUser
-                          ? 'bg-indigo-600 text-white'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      <p>{message.content}</p>
-                      <span className="text-xs opacity-75 mt-1 block">
-                        {message.timestamp.toLocaleTimeString()}
-                      </span>
-                    </div>
+    <div className="fixed inset-0 bg-gradient-to-r from-blue-50 to-blue-100">
+      <Navbar/>
+      <div className="h-full max-w-4xl mx-auto flex flex-col p-3">
+        {/* Fixed Header */}
+        <header className="text-center py-4">
+          <a href="" 
+             target="_blank" 
+             rel="noopener noreferrer"
+             className="block">
+            <h1 className="text-4xl font-bold text-blue-500 hover:text-blue-600 transition-colors">
+              Chat AI
+            </h1>
+          </a>
+        </header>
+
+        <div 
+          ref={chatContainerRef}
+          className="flex-1 overflow-y-auto mb-4 rounded-lg bg-white shadow-lg p-4 hide-scrollbar"
+        >
+          {chatHistory.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-center p-6">
+              <div className="bg-blue-50 rounded-xl p-8 max-w-2xl">
+                <h2 className="text-2xl font-bold text-blue-600 mb-4">Welcome to Chat AI! 👋</h2>
+                <p className="text-gray-600 mb-4">
+                  I'm here to help you with anything you'd like to know. You can ask me about:
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                  <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <span className="text-blue-500">💡</span> General knowledge
                   </div>
-                ))}
-                <div ref={messagesEndRef} />
+                  <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <span className="text-blue-500">🔧</span> Technical questions
+                  </div>
+                  <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <span className="text-blue-500">📝</span> Writing assistance
+                  </div>
+                  <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <span className="text-blue-500">🤔</span> Problem solving
+                  </div>
+                </div>
+                <p className="text-gray-500 mt-6 text-sm">
+                  Just type your question below and press Enter or click Send!
+                </p>
               </div>
             </div>
-            <form onSubmit={handleSend} className="flex gap-2">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Type your message..."
-                className="flex-1 rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
-                disabled={isLoading}
-              />
-              <button
-                type="submit"
-                disabled={isLoading || !input.trim()}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <Send className="h-5 w-5" />
-                )}
-              </button>
-            </form>
-          </>
-        )}
+          ) : (
+            <>
+              {chatHistory.map((chat, index) => (
+                <div key={index} className={`mb-4 ${chat.type === 'question' ? 'text-right' : 'text-left'}`}>
+                  <div className={`inline-block max-w-[80%] p-3 rounded-lg overflow-auto hide-scrollbar ${
+                    chat.type === 'question' 
+                      ? 'bg-blue-500 text-white rounded-br-none'
+                      : 'bg-gray-100 text-gray-800 rounded-bl-none'
+                  }`}>
+                    <ReactMarkdown className="overflow-auto hide-scrollbar">{chat.content}</ReactMarkdown>
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
+          {generatingAnswer && (
+            <div className="text-left">
+              <div className="inline-block bg-gray-100 p-3 rounded-lg animate-pulse">
+                Thinking...
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Fixed Input Form */}
+        <form onSubmit={generateAnswer} className="bg-white rounded-lg shadow-lg p-4">
+          <div className="flex gap-2">
+            <textarea
+              required
+              className="flex-1 border border-gray-300 rounded p-3 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 resize-none"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="Ask anything..."
+              rows="2"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  generateAnswer(e);
+                }
+              }}
+            ></textarea>
+            <button
+              type="submit"
+              className={`px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors ${
+                generatingAnswer ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              disabled={generatingAnswer}
+            >
+              Send
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
-};
+}
 
 export default Chatbot;
-
-
