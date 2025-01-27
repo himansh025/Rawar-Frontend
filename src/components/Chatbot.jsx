@@ -54,7 +54,7 @@ function Chatbot() {
 
   return (
 
-    <div className="fixed inset-0 bg-gradient-to-r from-blue-50 to-blue-100">
+    <div className="fixed inset-0  bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       <Navbar/>
       <div className="h-full max-w-4xl mx-auto flex flex-col p-3">
         {/* Fixed Header */}

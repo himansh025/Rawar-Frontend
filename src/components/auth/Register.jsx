@@ -66,6 +66,21 @@ function Register() {
             required
             className="mt-1 block w-full rounded-lg border border-gray-400 shadow-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 bg-white py-3 px-4 text-base text-gray-800 placeholder-gray-500"
             />
+            <Inputfield
+  placeholder="Enter your Email"
+  name="email"
+  type="text"
+  label="Email:"
+  register={register("email", {
+    required: "Email is required",
+    pattern: {
+      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      message: "Invalid email address",
+    },
+  })}
+  className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+/>
+
           <Inputfield
             placeholder="Enter your password"
             name="password"

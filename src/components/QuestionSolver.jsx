@@ -19,10 +19,10 @@ function QuestionSolver({ question, onBack, onNext,user }) {
   // const [submissionTimeout, setSubmissionTimeout] = useState(null);
   
   const handleSubmit = async () => {
-    if (submissionStats.questionsAttempted.has(question._id)) {
-      alert("You have already attempted this question.");
-      return;
-    }
+    // if (submissionStats.questionsAttempted.has(question._id)) {
+    //   alert("You have already attempted this question.");
+    //   return;
+    // }
     const isCorrect = selectedAnswer === question.correctAnswer;
   
     // Update submission stats

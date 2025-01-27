@@ -24,6 +24,7 @@ function Login() {
   Cookies.set('accessToken', accessToken);
 
   useEffect(() => {}, [accessToken]);
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleclick = () => {
     navigate('/signup');
@@ -75,6 +76,17 @@ function Login() {
           required 
           className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
         />
+
+  register={register("email", {
+    required: "Email is required",
+    pattern: {
+      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      message: "Invalid email address",
+    },
+  })}
+  className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+/>
+
         <Inputfield 
           placeholder="Enter your password" 
           name="password" 
