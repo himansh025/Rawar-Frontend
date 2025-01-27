@@ -50,11 +50,12 @@ console.log(user);
       alert("You have already started this test. You cannot start it again.");
       return;
     }
+   const id=  user._id ? user._id :user.createdUser._id
 
     try {
-      console.log(user.createdUser._id);
+      console.log(id);
       
-      await startTest(test._id, user.createdUser._id);
+      await startTest(test._id, id);
       setActiveTest(test);
       setCurrentQuestionIndex(0);
       setUserAnswers({});
@@ -86,10 +87,11 @@ console.log(user);
   };
 
   const handleSubmitTest = async () => {
+    const id=  user._id ? user._id :user.createdUser._id
     try {
       pauseTimer();
       const answers = Object.values(userAnswers);
-      const response = await submitTestAnswers(activeTest._id, answers, user.createdUser._id);
+      const response = await submitTestAnswers(activeTest._id, answers,id);
       setTestResults(response.data.data);
     } catch (err) {
       console.error('Error submitting test:', err);

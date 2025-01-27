@@ -15,6 +15,7 @@ import Register from './components/auth/Register';
 import AdminDashboard from './pages/AdminDashboard';
 import TestManagement from './components/TestManagement';
 import Chatbot from './components/Chatbot';
+import Revision from './pages/Revision';
 
 function FloatingChatbot() {
   const user = useSelector((state) => state.auth.user);
@@ -99,6 +100,7 @@ function App() {
               <Route index element={<Dashboard />} />
               <Route path="userprofile" element={<UserProfile />} />
               <Route path="questions" element={<QuestionBank />} />
+              <Route path="allquestions" element={<Revision />} />
               <Route path="questionsolver" element={<QuestionSolver />} />
               <Route path="mocktests" element={<MockTests />} />
               <Route path="chatbot" element={<Chatbot />} />

@@ -26,9 +26,9 @@ console.log(user.role);
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center"> 
-            <img src={pcteLogo} alt="PCTE Logo" className="h-11 w-11 mr-2" /> 
+            <img src={pcteLogo} alt="PCTE Logo" className="h-16 w-16 mr-2" /> 
             <Link to="/" className="flex items-center">
-              <span className="ml-2 text-sm font-bold text-gray-800">Placement Cell </span>
+              <span className="ml-2 text-lg font-bold text-gray-800">Placement Cell </span>
             </Link>
           </div>
 
@@ -39,7 +39,7 @@ console.log(user.role);
             ): <  NavLink to="/" icon={<Layout className="h-5 w-5" />} text="Dashboard" />}
          
             <NavLink to="/user/questions" icon={<BookOpen className="h-5 w-5" />} text="Questions" />
-            {/* <NavLink to="/user/chatbot" icon={<BookOpen className="h-5 w-5" />} text="chatbot" /> */}
+            <NavLink to="/user/allquestions" icon={<BookOpen className="h-5 w-5" />} text="Revision" />
             <NavLink to="/user/mocktests" icon={<TestTube2 className="h-5 w-5" />} text="Mock Tests" />
             {/* <NavLink to="/leaderboard" icon={<Trophy className="h-5 w-5" />} text="Leaderboard" /> */}
           </div>
@@ -102,29 +102,33 @@ console.log(user.role);
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden ${isMobileMenuOpen ? "block" : "hidden"} bg-gray-100 rounded-lg shadow-md p-4 space-y-4`}
+        className={`md:hidden ${isMobileMenuOpen ? "block" : "hidden"} bg-gray-100 rounded-lg shadow-md p-2 space-y-2`}
       >
         <MobileNavLink to="/" text="Home" onClick={toggleMobileMenu} />
         <MobileNavLink to="user/questions" text="Questions" onClick={toggleMobileMenu} />
         <MobileNavLink to="user/mocktests" text="Mock Tests" onClick={toggleMobileMenu} />
-        <MobileNavLink to="user/userprofile" text="Profile" onClick={toggleMobileMenu} />
+        <MobileNavLink to="user/allquestions" text=" Revision" onClick={toggleMobileMenu} />
+      
         {/* <MobileNavLink to="/leaderboard" text="Leaderboard" onClick={toggleMobileMenu} /> */}
         {!user ? (
-          <div className="space-y-2">
+          <div className="space-y-1 border-t-2 border-slate-400">
             <MobileNavLink to="/login" text="Login" onClick={toggleMobileMenu} />
             <MobileNavLink to="/signup" text="Signup" onClick={toggleMobileMenu} />
             <MobileNavLink to="/adminlogin" text="Admin" onClick={toggleMobileMenu} />
           </div>
         ) : (
+          <>
+            <MobileNavLink to="user/userprofile" text="Profile" onClick={toggleMobileMenu} />
           <button
-            onClick={() => {
-              handleLogout();
-              toggleMobileMenu();
-            }}
-            className="block w-full text-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+          onClick={() => {
+            handleLogout();
+            toggleMobileMenu();
+          }}
+          className="block w-full text-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
           >
             Logout
           </button>
+            </>
         )}
       </div>
     </nav>
@@ -148,7 +152,7 @@ function MobileNavLink({ to, text, onClick }) {
   return (
     <Link
       to={to}
-      className="block text-gray-700 hover:text-blue-600 px-4 py-2"
+      className="block text-gray-700 sm:text-lg hover:text-blue-600 px-4 py-1"
       onClick={onClick}
     >
       {text}

@@ -17,7 +17,7 @@ const AdminDashboard = () => {
             const userResponse = await fetchalluser();
             //   console.log("aya kya", userResponse);
             const testResponse = await getAllTests();
-            //   console.log("aya kya", testResponse.data[0]);
+              console.log("aya kya", testResponse.data.length);
             setUsers(userResponse.data || []);
             setMockTests(testResponse.data || []);
         } catch (error) {
@@ -90,27 +90,31 @@ const AdminDashboard = () => {
                     </div>
                     <div className="bg-gray-800 rounded-xl p-6 shadow-lg transform hover:scale-[1.02] transition-all duration-200">
                         <div className="flex items-center gap-4 mb-6">
+
                             <div className="p-3 bg-purple-600 rounded-lg">
                                 <ClipboardList className="h-6 w-6 text-white" />
                             </div>
                             <h2 className="text-xl font-semibold text-white">Mock Tests</h2>
+
                         </div>
-                        <div className="space-y-3">
-                            {mockTests.map((test) => (
-                                <div key={test.id} className="p-3 bg-gray-700 rounded-lg">
-                                    <p className="text-gray-200">{test.title}</p>
-                                    <p className="text-sm text-gray-400">{test.category}</p>
-                                </div>
-                            ))}
-                        </div>
-                        {mockTests.length > 2 ? (
-                            <button
-                                onClick={() => setShowAllTests(!showAllTests)}
-                                className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 focus:outline-none"
-                            >
-                                {showAllTests ? 'Hide test' : 'Show All test'}
-                            </button>
-                        ) : null}
+                        <div className="text-3xl font-bold text-white mb-4">{mockTests.length || 0}</div>
+                        {showAllTests && (
+                            <div className="space-y-3">
+                                {mockTests.map((test) => (
+                                    <div key={test.id} className="p-3 bg-gray-700 rounded-lg">
+                                        <p className="text-gray-200">{test.title}</p>
+                                        <p className="text-sm text-gray-400">{test.category}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        <button
+                            onClick={() => setShowAllTests(!showAllTests)}
+                            className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 focus:outline-none"
+                        >
+                            {showAllTests ? 'Hide tests' : 'Show All tests'}
+                        </button>
+
 
                     </div>
                 </div>

@@ -20,6 +20,8 @@ const fetchQuestions = async (params) => {
   }
 };
 
+
+
 const getResult = async (userid) => {
   try {
     const response = await fetch(`${apiUrl}/api/v1/questions/getResult`,userid,{
@@ -123,4 +125,7 @@ export {
   addQuestion,
   getResult,
   deleteQuestion,
+  
 };
+
+
