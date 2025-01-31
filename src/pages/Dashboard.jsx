@@ -6,6 +6,7 @@ import StatesCard from "../components/StatesCard";
 import ProgressBar from "../components/ProgressBar";
 import { BookOpen, Clock, Brain, Award, User, Check } from "lucide-react";
 import { getCurrentUser } from "../utils/userDataFetch.js";
+import { Revisionfetch } from "../utils/revisionDataFetch.js";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -13,10 +14,9 @@ const Dashboard = () => {
   const user = useSelector((state) => state.auth.user);
   const [questions, setQuestions] = useState([]);
   const [mockTests, setMockTests] = useState([]);
+  const [revision, setrevision] = useState([]);
   const [progressData, setProgressData] = useState([]);
-// console.log(user);
-const checkuser=user?.loggedinuser?._id || user.role;
-// console.log(checkuser);
+console.log(user);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,14 +25,17 @@ const checkuser=user?.loggedinuser?._id || user.role;
           axios.get(`${apiUrl}/api/v1/questions/GetAllquestion`),
           axios.get(`${apiUrl}/api/v1/tests/alltests`),
         ]);
+        const response = await Revisionfetch()
+        // console.log("data",response)
 
         if (user) {
           const result = await getCurrentUser();
-          console.log(result);
-          console.log(test);
-          console.log(questions);
+          // console.log(result);
+          // console.log(test);
+          // console.log(questions);
           
           setProgressData(result.data);
+          setrevision(response || []);
           setQuestions(questionsRes.data || []);
           setMockTests(test.data.data || []);
         }
@@ -44,10 +47,11 @@ const checkuser=user?.loggedinuser?._id || user.role;
     fetchData();
   }, [apiUrl, user]);
 
-  const calculateSuccessRate = (completed, correct) => {
-    if (completed === 0) return 0;
+  const calculateSuccessRate = (completed = 0, correct = 0) => {
+    if (!completed) return 0; // Ensures completed is not undefined/null/0
     return ((correct / completed) * 100).toFixed(2);
   };
+  
 
   const stats = [
     {
@@ -67,8 +71,8 @@ const checkuser=user?.loggedinuser?._id || user.role;
     {
       label: "Success Rate",
       value: calculateSuccessRate(
-        progressData?.progress?.completedQuestions,
-        progressData?.progress?.correctAnswers
+        progressData?.progress?.completedQuestions || 0,
+        progressData?.progress?.correctAnswers || 0
       ),
       icon: Brain,
       color: "bg-gradient-to-br from-green-500 to-green-600",
@@ -115,7 +119,7 @@ const checkuser=user?.loggedinuser?._id || user.role;
             )}
           </div>
         </header>
-{checkuser ?(
+
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {stats.map((stat) => (
             <StatesCard
@@ -127,7 +131,7 @@ const checkuser=user?.loggedinuser?._id || user.role;
             />
           ))}
         </div>
-        ):null}
+     
 
         {user && (
           <div className="bg-white rounded-xl shadow-lg p-8 mb-10 transform hover:shadow-xl transition-shadow duration-300">
@@ -153,7 +157,7 @@ const checkuser=user?.loggedinuser?._id || user.role;
           <Card title="Aptitude Questions" data={questions} link="user/questions" />
           <Card title="Available Mock Tests" data={mockTests} link="user/mocktests" />
 
-          <Card title="Revise Aptitude Questions" data={mockTests} link="user/allquestions" />
+          <Card title="Revise Aptitude Questions" data={revision} link="user/allquestions" />
         </div>
         
       </div>
