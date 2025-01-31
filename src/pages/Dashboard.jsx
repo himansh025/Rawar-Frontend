@@ -14,6 +14,9 @@ const Dashboard = () => {
   const [questions, setQuestions] = useState([]);
   const [mockTests, setMockTests] = useState([]);
   const [progressData, setProgressData] = useState([]);
+// console.log(user);
+const checkuser=user?.loggedinuser?._id || user.role;
+// console.log(checkuser);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -112,7 +115,7 @@ const Dashboard = () => {
             )}
           </div>
         </header>
-{user && user.role=="user"(
+{checkuser ?(
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {stats.map((stat) => (
             <StatesCard
@@ -124,7 +127,7 @@ const Dashboard = () => {
             />
           ))}
         </div>
-        )}
+        ):null}
 
         {user && (
           <div className="bg-white rounded-xl shadow-lg p-8 mb-10 transform hover:shadow-xl transition-shadow duration-300">
