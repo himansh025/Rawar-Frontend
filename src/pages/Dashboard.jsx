@@ -93,6 +93,7 @@ const Dashboard = () => {
                   : "Sign in to track your progress and start learning"}
               </p>
             </div>
+
             {user && (
              <div className="h-24 w-24 md:h-32 md:w-32 rounded-full overflow-hidden bg-white shadow-2xl ring-4 ring-indigo-400 ring-opacity-50">
              {progressData.avatar ? (
@@ -111,18 +112,19 @@ const Dashboard = () => {
             )}
           </div>
         </header>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+{user && user.role=="user"(
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {stats.map((stat) => (
             <StatesCard
-              key={stat.label}
-              icon={<stat.icon className="h-7 w-7" />}
-              title={stat.label}
-              value={stat.value}
-              className={`p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 ${stat.color}`}
+            key={stat.label}
+            icon={<stat.icon className="h-7 w-7" />}
+            titl  e={stat.label}
+            value={stat.value}
+            className={`p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 ${stat.color}`}
             />
           ))}
         </div>
+        )}
 
         {user && (
           <div className="bg-white rounded-xl shadow-lg p-8 mb-10 transform hover:shadow-xl transition-shadow duration-300">
@@ -147,7 +149,10 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <Card title="Aptitude Questions" data={questions} link="user/questions" />
           <Card title="Available Mock Tests" data={mockTests} link="user/mocktests" />
+
+          <Card title="Revise Aptitude Questions" data={mockTests} link="user/allquestions" />
         </div>
+        
       </div>
      
     </div>
