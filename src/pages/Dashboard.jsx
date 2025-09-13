@@ -4,11 +4,10 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import StatesCard from "../components/StatesCard";
 import ProgressBar from "../components/ProgressBar";
-import { BookOpen, Clock, Brain, Award, User, Check } from "lucide-react";
+import { BookOpen,  User, Check } from "lucide-react";
 import { getCurrentUser } from "../utils/userDataFetch.js";
 import { Revisionfetch } from "../utils/revisionDataFetch.js";
-// import Images from "../components/Images.jsx";
-
+import Loader from '../components/Loader.jsx' 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const Dashboard = () => {
@@ -17,9 +16,11 @@ const Dashboard = () => {
   const [mockTests, setMockTests] = useState([]);
   const [revision, setrevision] = useState([]);
   const [progressData, setProgressData] = useState([]);
+  const [loading,setLoading]= useState(false)
 // console.log(user);
 
   useEffect(() => {
+    setLoading(true)
     const fetchData = async () => {
       try {
         const [questionsRes, test] = await Promise.all([
@@ -39,18 +40,21 @@ const Dashboard = () => {
       } catch (error) {
         console.error("Error fetching data:", error);
       }
+      finally{
+        setLoading(false)
+      }
     };
 
     fetchData();
   }, [apiUrl, user]);
   console.log(questions,mockTests,revision)
 
-  const calculateSuccessRate = (completed = 0, correct = 0) => {
-    if (!completed) return 0; // Ensures completed is not undefined/null/0
-    return ((correct / completed) * 100).toFixed(2);
-  };
-  
 
+  if(loading){
+    return(
+      <Loader/>
+    )
+  }
   return (
     <div className="min-h-screen ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
