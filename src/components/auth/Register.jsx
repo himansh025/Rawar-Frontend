@@ -44,7 +44,7 @@ function Register() {
 
   return (
     <div className="max-w-md mx-auto rounded-3xl bg-slate-800 shadow-2xl mt-10">
-      <h2 className="text-3xl font-bold text-center mb-8 mt-5 pt-5">
+      <h2 className="text-3xl font-bold text-center text-blue-50 mb-8 mt-5 pt-5">
         Create Account
       </h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

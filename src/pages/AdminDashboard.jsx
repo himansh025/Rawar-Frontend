@@ -17,7 +17,7 @@ const AdminDashboard = () => {
             const userResponse = await fetchalluser();
             //   console.log("aya kya", userResponse);
             const testResponse = await getAllTests();
-              console.log("aya kya", testResponse.data.length);
+            //   console.log("aya kya", testResponse.data.length);
             setUsers(userResponse.data || []);
             setMockTests(testResponse.data || []);
         } catch (error) {

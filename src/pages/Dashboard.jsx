@@ -7,6 +7,7 @@ import ProgressBar from "../components/ProgressBar";
 import { BookOpen, Clock, Brain, Award, User, Check } from "lucide-react";
 import { getCurrentUser } from "../utils/userDataFetch.js";
 import { Revisionfetch } from "../utils/revisionDataFetch.js";
+// import Images from "../components/Images.jsx";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -16,7 +17,7 @@ const Dashboard = () => {
   const [mockTests, setMockTests] = useState([]);
   const [revision, setrevision] = useState([]);
   const [progressData, setProgressData] = useState([]);
-console.log(user);
+// console.log(user);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,17 +28,13 @@ console.log(user);
         ]);
         const response = await Revisionfetch()
         // console.log("data",response)
-
+        
+        setrevision(response || []);
+        setQuestions(questionsRes.data || []);
+        setMockTests(test.data.data || []);
         if (user) {
           const result = await getCurrentUser();
-          // console.log(result);
-          // console.log(test);
-          // console.log(questions);
-          
           setProgressData(result.data);
-          setrevision(response || []);
-          setQuestions(questionsRes.data || []);
-          setMockTests(test.data.data || []);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -46,44 +43,13 @@ console.log(user);
 
     fetchData();
   }, [apiUrl, user]);
+  console.log(questions,mockTests,revision)
 
   const calculateSuccessRate = (completed = 0, correct = 0) => {
     if (!completed) return 0; // Ensures completed is not undefined/null/0
     return ((correct / completed) * 100).toFixed(2);
   };
   
-
-  const stats = [
-    {
-      label: "Questions Solved",
-      value: progressData?.progress?.completedQuestions || 0,
-      total: 200,
-      icon: BookOpen,
-      color: "bg-gradient-to-br from-blue-500 to-blue-600",
-    },
-    {
-      label: "Tests Taken",
-      value: progressData?.progress?.testsTaken || 0,
-      total: 20,
-      icon: Clock,
-      color: "bg-gradient-to-br from-purple-500 to-purple-600",
-    },
-    {
-      label: "Success Rate",
-      value: calculateSuccessRate(
-        progressData?.progress?.completedQuestions || 0,
-        progressData?.progress?.correctAnswers || 0
-      ),
-      icon: Brain,
-      color: "bg-gradient-to-br from-green-500 to-green-600",
-    },
-    {
-      label: "Current Rank",
-      value: `#${user?.stats?.rank || 0}`,
-      icon: Award,
-      color: "bg-gradient-to-br from-orange-500 to-orange-600",
-    },
-  ];
 
   return (
     <div className="min-h-screen ">
@@ -119,19 +85,7 @@ console.log(user);
             )}
           </div>
         </header>
-
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-          {stats.map((stat) => (
-            <StatesCard
-            key={stat.label}
-            icon={<stat.icon className="h-7 w-7" />}
-            titl  e={stat.label}
-            value={stat.value}
-            className={`p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 ${stat.color}`}
-            />
-          ))}
-        </div>
-     
+    
 
         {user && (
           <div className="bg-white rounded-xl shadow-lg p-8 mb-10 transform hover:shadow-xl transition-shadow duration-300">
@@ -168,9 +122,9 @@ console.log(user);
 
 
 const Card = ({ title, data, link }) => (
-  <div className="bg-white shadow-lg rounded-xl p-8 transform hover:shadow-xl transition-all duration-300">
-    <div className="flex items-center justify-between mb-8">
-      <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+  <div className="bg-white shadow-lg rounded-xl p-4 transform hover:shadow-xl transition-all duration-300">
+    <div className="flex items-center justify-between mb-4">
+      <h2 className="text-xl font-bold text-gray-800">{title}</h2>
       <Link 
         to={link} 
         className="px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-500 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors duration-300"
@@ -178,11 +132,11 @@ const Card = ({ title, data, link }) => (
         View all
       </Link>
     </div>
-    <div className="space-y-4">
+    <div className="space-y-3">
       {data.slice(0, 3).map((item) => (
         <div
           key={item._id}
-          className="p-6 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all duration-300 transform hover:scale-[1.02]"
+          className="p-2 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all duration-300 transform hover:scale-[1.02]"
         >
           <h3 className="text-base font-semibold text-gray-900">{item.title || item.question}</h3>
           <div className="flex items-center gap-4 mt-3">

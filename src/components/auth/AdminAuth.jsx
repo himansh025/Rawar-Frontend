@@ -21,7 +21,7 @@ const AdminAuth = () => {
 
   // useEffect(() => {
   // }, [accessToken]);
-  console.log("isadmin",user);
+  // console.log("isadmin",user);
   
 
   const onSubmit = async (data, e) => {
@@ -31,14 +31,14 @@ const AdminAuth = () => {
 
     try {
       const userdata = await adminlogin(data);
-      console.log("data",userdata);
+      // console.log("data",userdata);
        
       if(userdata.data.role){
    
         localStorage.setItem('accessToken', userdata.data.accesstoken);
         localStorage.setItem('refreshToken', userdata.data.refreshtoken);
         const user = userdata.data;
-        console.log(user);
+        // console.log(user);
         
         dispatch(login({ user }));
         navigate('/admin');}

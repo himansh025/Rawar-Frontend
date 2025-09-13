@@ -37,7 +37,7 @@ const Verifyotp = () => {
         try {
             const data = { email, otp };
             const response = await verifyOtp(data);
-console.log(response);
+// console.log(response);
 
             if (response.data) {
                 setSuccess('OTP verified successfully!');

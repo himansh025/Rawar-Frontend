@@ -1,16 +1,16 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { BookOpen, Layout, Menu, TestTube2, Trophy, User } from "lucide-react";
+import { BookA, BookOpen, Layout, Menu, ReplaceAll, TestTube2, User } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../store/authSlice.js";
-import pcteLogo from '../image.png' 
+// import pcteLogo from '../image.png' 
 
 function Navbar() {
   const user = useSelector((state) => state.auth.user) || false;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-console.log(user.role);
+// console.log(user.role);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -26,9 +26,10 @@ console.log(user.role);
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center"> 
-            <img src={pcteLogo} alt="PCTE Logo" className="h-16 w-16 mr-2" /> 
+            {/* <img src={pcteLogo} alt="PCTE Logo" className="h-16 w-16 mr-2" />  */}
+            <BookA/>
             <Link to="/" className="flex items-center">
-              <span className="ml-2 text-lg font-bold text-gray-800">Placement Cell </span>
+              <span className="ml-2 text-lg font-bold text-gray-800">PrepNow </span>
             </Link>
           </div>
 

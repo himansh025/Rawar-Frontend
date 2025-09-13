@@ -43,7 +43,7 @@ function MockTests() {
       navigate('/user/login');
       return;
     }
-console.log(user);
+// console.log(user);
 
     const isTestTaken = user?.testSessions?.some(session => session.testId === test._id);
     if (isTestTaken) {
@@ -53,7 +53,7 @@ console.log(user);
    const id=  user._id ? user._id :user.createdUser._id
 
     try {
-      console.log(id);
+      // console.log(id);
       
       await startTest(test._id, id);
       setActiveTest(test);
